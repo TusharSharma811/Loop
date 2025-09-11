@@ -37,13 +37,14 @@ app.use('/api/auth', authRoute);
 
 async function startServer() {
   try {
+    const PORT = process.env.PORT || 3000;
     await publisher.connect();
     await subscriber.connect();
     const socketIo = new SocketIo(io);
     await socketIo.init();
     
-    server.listen(3000, () => {
-      console.log('Server is running on port 3000');
+    server.listen(PORT, () => {
+      console.log('Server is running on port', PORT);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

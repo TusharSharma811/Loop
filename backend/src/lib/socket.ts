@@ -14,13 +14,13 @@ export class SocketIo {
             console.log("New client connected" , socket.id);
 
             socket.on("NewMessage", async ({ message , chatId , userId } :{ message: string , chatId: string , userId: string }) => {
-                await prisma.message.create({
-                    data: {
-                        chatId: parseInt(chatId),
-                        senderId: parseInt(userId),
-                        content: message,
-                    }
-                });
+                // await prisma.message.create({
+                //     data: {
+                //         chatId: parseInt(chatId),
+                //         senderId: parseInt(userId),
+                //         content: message,
+                //     }
+                // });
                 await publisher.publish("chat", JSON.stringify({ message, chatId, userId }));
             });
             socket.on("disconnect", () => {

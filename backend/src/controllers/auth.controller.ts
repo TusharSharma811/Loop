@@ -32,7 +32,7 @@ export const login = async (req: Request, res: Response) => {
 export const register = async (req: Request, res: Response) => {
   // Handle registration logic
   try {
-    const {username , email , password , avatar} = req.body;
+    const {username , email , fullname , password , avatar} = req.body;
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
@@ -48,6 +48,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await prisma.user.create({
       data: {
         username,
+        fullname,
         email,
         passwordHash: hashedPassword
       }

@@ -9,7 +9,13 @@ import {SocketIo} from './lib/socket.ts';
 import { publisher , subscriber } from './lib/redisClient.ts';
 
 const app = express();
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 process.on("uncaughtException", (err) => {
   console.error("❌ Uncaught Exception:", err);
   process.exit(1);
@@ -23,16 +29,12 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
+    credentials: true,
   },
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-}));
+
+
 app.use('/api/auth', authRoute);
 
 async function startServer() {

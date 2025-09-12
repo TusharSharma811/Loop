@@ -18,9 +18,17 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
           setLoading(false);
           return children;
         }
-        const res = await axiosInstance.post("/auth/verify");
-        if (res.data.valid) {
-          setIsAuthenticated(true);
+        const res = await fetch('/api/auth/verify', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.valid) {
+            setIsAuthenticated(true);
+          } else {
+            setIsAuthenticated(false);
+          }
         }
       } catch (err) {
         setIsAuthenticated(false);
@@ -35,7 +43,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   if (loading) return <div>Loading...</div>;
 
-  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (!isAuthenticated) return <Navigate to="/auth/signin" replace />;
 
   return children;
 };

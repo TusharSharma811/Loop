@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import { create } from "zustand";
 import axiosInstance from "../lib/axiosInstance";
 
@@ -20,8 +20,19 @@ const useAuthStore = create<AuthState>((set) => ({
   getUser: () => { return useAuthStore.getState().user; },
   fetchUser: async () => {
     try {
-      const response = await axiosInstance.get("/auth/me");
-      set({ user: response.data.user });
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      set({ user: data.user });
+      localStorage.setItem('isAuthenticated', 'true');
+      if (response.ok) {
+        set({ isAuthenticated: true });
+      } else {
+        set({ isAuthenticated: false, user: null });
+        localStorage.removeItem('isAuthenticated');
+      }
     } catch (error) {
       console.error(error);
     }

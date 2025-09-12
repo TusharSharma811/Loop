@@ -4,28 +4,32 @@ import useAuthStore from './store/authStore';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ChatPage } from './pages/ChatPage';
 import { useEffect } from 'react';
+import ProtectedRoute from './components/ProtectRoutes';
+import PublicRouteWrapper from './components/PublicRouteWrapper';
 
 
 function App() {
 
-  const { isAuthenticated, fetchUser } = useAuthStore();
+  const { isAuthenticated, fetchUser, setIsAuthenticated } = useAuthStore();
   useEffect(()=>{
     if(isAuthenticated){
       fetchUser();
+      setIsAuthenticated(true);
+      localStorage.setItem('isAuthenticated', 'true');
     }
   }, [isAuthenticated, fetchUser]);
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <LandingPage  />,
+      element:<PublicRouteWrapper><LandingPage  /></PublicRouteWrapper>,
     },
     {
       path: "/auth/:mode",
-      element: <AuthPage  />,
+      element: <PublicRouteWrapper><AuthPage  /></PublicRouteWrapper>,
     },
     {
       path: "/chat",
-      element: <ChatPage />,
+      element: <ProtectedRoute><ChatPage /></ProtectedRoute>,
     },
   ]);
 

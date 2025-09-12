@@ -1,36 +1,46 @@
 import { publisher , subscriber } from "./redisClient.ts";
-import type{ Server ,Socket } from "socket.io";
+import{ Server ,Socket } from "socket.io";
 import prisma from "./prismaClient.ts";
 export class SocketIo {
 
     io: Server;
+    private socket: Socket | null = null;
     isSubscribed = false;
     constructor(io: Server) {
         this.io = io;
     }
     async init() {
+        
 
         this.io.on("connection", (socket: any) => {
             console.log("New client connected" , socket.id);
+            this.socket = socket;
 
             socket.on("NewMessage", async ({ message , chatId , userId } :{ message: string , chatId: string , userId: string }) => {
-                // await prisma.message.create({
-                //     data: {
-                //         chatId: parseInt(chatId),
-                //         senderId: parseInt(userId),
-                //         content: message,
-                //     }
-                // });
+                const data = JSON.parse(message);
+                if (!data.text || !chatId || !userId) {
+                    console.error("Invalid message data");
+                    return;
+                }
+                
+                await prisma.message.create({
+                    data: {
+                        chatId: parseInt(chatId),
+                        senderId: parseInt(userId),
+                        content: data.text,
+
+                    }
+                });
                 await publisher.publish("chat", JSON.stringify({ message, chatId, userId }));
             });
             socket.on("disconnect", () => {
                 console.log("Client disconnected" , socket.id);
             });
         });
-        if (!this.isSubscribed) {
+        if (!this.isSubscribed) { 
             await subscriber.subscribe("chat", (message) => {
             const data = JSON.parse(message);
-            this.io.to(data.chatId).emit("NewMessage", data);
+            this.socket?.emit("NewMessage", data);
       });
       this.isSubscribed = true;
     }

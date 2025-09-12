@@ -77,3 +77,16 @@ model MessageStatus {
 
   @@unique([messageId, userId])
 }
+
+
+model CallSession {
+  id          Int      @id @default(autoincrement())
+  chatId      Int
+  initiatorId Int
+  receiverId  Int
+  callType    String   // audio, video
+  status      String   @default("initiated") // initiated, ringing, in_progress, ended
+  startedAt   DateTime @default(now())
+  endedAt     DateTime?
+  createdAt   DateTime @default(now())
+}

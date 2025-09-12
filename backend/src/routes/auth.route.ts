@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, register, logout, refreshToken, googleLogin, googleLoginCallback } from "../controllers/auth.controller.js";
+import { login, register, logout, refreshToken, googleLogin, googleLoginCallback, verify } from "../controllers/auth.controller.js";
 import { protectRoutes } from "../middlewares/protectRoutes.js";
 const router = Router();
 
@@ -9,6 +9,6 @@ router.post("/logout" , logout);
 router.post("/refresh-token" , refreshToken);
 router.get("/google-login" , googleLogin);
 router.get("/google-login/callback" , googleLoginCallback);
-
+router.post("/verify", protectRoutes, verify);
 
 export default router;

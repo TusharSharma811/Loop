@@ -100,3 +100,9 @@ export const googleLogin = (req: Request, res: Response) => {
 export const googleLoginCallback = (req: Request, res: Response) => {
     // Handle Google login callback logic
 }
+
+
+
+export const verify = (req: Request, res: Response) => {
+  return res.status(200).json({ valid: true });
+}

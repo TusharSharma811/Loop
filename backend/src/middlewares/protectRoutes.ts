@@ -14,7 +14,7 @@ export const protectRoutes  = async (req: RequestWithUser, res: Response, next: 
         return res.status(401).json({ message: 'Unauthorized' });
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
-  
+    
     req.user  = decoded;
     next();
 } catch (error) {

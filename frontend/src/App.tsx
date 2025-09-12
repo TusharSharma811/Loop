@@ -1,29 +1,42 @@
-import Register from "./pages/auth/register";
-import Login from "./pages/auth/login";
-import Landing from "./pages/Landing"
-import { createBrowserRouter,  RouterProvider } from "react-router-dom"
+import { LandingPage } from './pages/Landing';
+import { AuthPage } from './pages/Auth';
+import useAuthStore from './store/authStore';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { ChatPage } from './pages/ChatPage';
+import { useEffect } from 'react';
+
 
 function App() {
+
+  const { isAuthenticated, fetchUser } = useAuthStore();
+  useEffect(()=>{
+    if(isAuthenticated){
+      fetchUser();
+    }
+  }, [isAuthenticated, fetchUser]);
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Landing />,
+      element: <LandingPage  />,
     },
     {
-      path:"/auth/register",
-      element:<Register />
-    },  
+      path: "/auth/:mode",
+      element: <AuthPage  />,
+    },
     {
-      path:"/auth/login",
-      element:<Login />
-    }
+      path: "/chat",
+      element: <ChatPage />,
+    },
   ]);
 
+
+
+ 
   return (
-    <>
-     <RouterProvider router={router} />
-    </>
-  )
+   <>
+   <RouterProvider router={router} />
+   </>
+  );
 }
 
-export default App
+export default App;

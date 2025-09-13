@@ -1,43 +1,44 @@
-
 import { create } from "zustand";
-import axiosInstance from "../lib/axiosInstance";
 
-
-export type AuthState = {
-  isAuthenticated: boolean;
-  user:any | null;
-  setIsAuthenticated: (value: boolean) => void;
-  setUser: (user: any | null) => void;
-  getUser: () => any | null;
-  fetchUser: () => Promise<void>;
-};
+interface AuthState {
+  isAuthenticated: boolean | null; // null = unknown
+  setIsAuthenticated: (v: boolean) => void;
+  checkAuth: () => Promise<void>;
+}
 
 const useAuthStore = create<AuthState>((set) => ({
-  isAuthenticated: false,
-  setIsAuthenticated: (value: boolean) => set({ isAuthenticated: value }),
-  user: null,
-  setUser: (user: any | null) => set({ user }),
-  getUser: () => { return useAuthStore.getState().user; },
-  fetchUser: async () => {
+  isAuthenticated: null,
+
+  setIsAuthenticated: (v) => set({ isAuthenticated: v }),
+
+  checkAuth: async () => {
     try {
-      const response = await fetch('/api/auth/me', {
-        method: 'GET',
-        credentials: 'include',
-      });
-      const data = await response.json();
-      set({ user: data.user });
-      localStorage.setItem('isAuthenticated', 'true');
-      if (response.ok) {
-        set({ isAuthenticated: true });
-      } else {
-        set({ isAuthenticated: false, user: null });
-        localStorage.removeItem('isAuthenticated');
+      const res = await fetch("/api/auth/verify", { credentials: "include" });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.valid) {
+          set({ isAuthenticated: true });
+          return;
+        }
       }
-    } catch (error) {
-      console.error(error);
+
+      // If access token invalid → try refresh
+      const refreshRes = await fetch("/api/auth/refresh-token", { credentials: "include" });
+      if (refreshRes.ok) {
+        const data = await refreshRes.json();
+        if (data.valid) {
+          set({ isAuthenticated: true });
+          return;
+        }
+      }
+
+      set({ isAuthenticated: false });
+    } catch (err) {
+      console.error("Auth check failed", err);
+      set({ isAuthenticated: false });
     }
-  }
+  },
 }));
 
 export default useAuthStore;
-

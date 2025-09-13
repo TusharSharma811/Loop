@@ -1,28 +1,27 @@
-import React, { useEffect } from 'react'
-import useAuthStore from '../store/authStore'
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+import { Navigate } from "react-router-dom";
+import useAuthStore from "../store/authStore";
 
-
-
-const PublicRouteWrapper = ({children}) => {
-    const { isAuthenticated } = useAuthStore();
-    console.log(isAuthenticated);
-    const navigate = useNavigate() ;
-
-    useEffect(() => {
-
-        
-    if (localStorage.getItem('isAuthenticated') === 'true' || isAuthenticated) {
-        navigate('/chat');
-    }
-
-}, [isAuthenticated]);
-
-    return (
-    <div>
-        {children}
-    </div>
-  )
+interface Props {
+  children: React.ReactNode;
 }
 
-export default PublicRouteWrapper
+const PublicRouteWrapper: React.FC<Props> = ({ children }) => {
+  const { isAuthenticated, checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    if (isAuthenticated === null) {
+      checkAuth(); // run only if unknown
+    }
+  }, [isAuthenticated, checkAuth]);
+
+  if (isAuthenticated === null) return <div>Loading...</div>;
+
+  if (isAuthenticated) {
+    return <Navigate to="/chat" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+export default PublicRouteWrapper;

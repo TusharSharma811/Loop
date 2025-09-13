@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import prisma from "../lib/prismaClient.ts";
 import bcrypt from "bcryptjs";
+import { generateJWT , generateRefreshJWT } from "../utils/generateJWT.ts";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
@@ -18,14 +19,8 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
     const userPayload = { id: user.id, email: user.email };
-    const accesstoken = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET as string
-    );
-    const refreshToken = jwt.sign(
-      { userId: user.id },
-      process.env.REFRESH_TOKEN_SECRET as string
-    );
+    const accesstoken = generateJWT(user.id);
+    const refreshToken = generateRefreshJWT(user.id);
     res.cookie("token", accesstoken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -63,14 +58,8 @@ export const register = async (req: Request, res: Response) => {
         passwordHash: hashedPassword,
       },
     });
-    const accesstoken = jwt.sign(
-      { userId: user.id },
-      process.env.JWT_SECRET as string
-    );
-    const refreshToken = jwt.sign(
-      { userId: user.id },
-      process.env.REFRESH_TOKEN_SECRET as string
-    );
+    const accesstoken = generateJWT(user.id);
+    const refreshToken = generateRefreshJWT(user.id);
     res.cookie("token", accesstoken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -103,31 +92,32 @@ export const logout = (req: Request, res: Response) => {
 };
 
 export const refreshToken = (req: Request, res: Response) => {
-  // Handle token refresh logic
+
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+    console.log("Refresh token received:", refreshToken);
     const decoded = jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET as string
     ) as { userId: string };
-    const accesstoken = jwt.sign(
-      { userId: decoded.userId },
-      process.env.JWT_SECRET as string
-    );
+    const accesstoken = generateJWT(decoded.userId);
+    const refreshTokenNew = generateRefreshJWT(decoded.userId);
     res.cookie("token", accesstoken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite:"none",
       maxAge: 15 * 60 * 1000,
     });
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", refreshTokenNew, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite:"none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    return res.status(200).json({ message: "Token refreshed successfully" });
+    return res.status(200).json({ message: "Token refreshed successfully", valid : true });
   } catch (error) {
     console.error("Error refreshing token", error);
     return res.status(500).json({ message: "Internal server error" });

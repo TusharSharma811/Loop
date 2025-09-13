@@ -2,7 +2,7 @@ import React from 'react';
 import { Check, CheckCheck } from 'lucide-react';
 import type { Message, User } from '../types';
 import { currentUser } from '../utils/MockData';
-
+import useAuthStore from '../store/authStore';
 interface MessageBubbleProps {
   message: Message;
   sender: User | undefined;
@@ -19,6 +19,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+  const user = useAuthStore((state) => state.user);
 
   const getStatusIcon = () => {
     if (!isOwn) return null;
@@ -41,7 +42,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div className="mr-3">
           {showAvatar ? (
             <img
-              src={sender?.avatar || ''}
+              src={sender?.avatar || user?.fullname.charAt(0).toUpperCase()}
               alt={sender?.name || 'User'}
               className="w-8 h-8 rounded-full object-cover"
             />

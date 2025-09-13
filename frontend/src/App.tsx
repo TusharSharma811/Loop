@@ -10,14 +10,11 @@ import PublicRouteWrapper from './components/PublicRouteWrapper';
 
 function App() {
 
-  const { isAuthenticated, fetchUser, setIsAuthenticated } = useAuthStore();
-  useEffect(()=>{
-    if(isAuthenticated){
-      fetchUser();
-      setIsAuthenticated(true);
-      localStorage.setItem('isAuthenticated', 'true');
-    }
-  }, [isAuthenticated, fetchUser]);
+  const {  fetchUser} = useAuthStore();
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
   const router = createBrowserRouter([
     {
       path: "/",

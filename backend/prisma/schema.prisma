@@ -30,7 +30,7 @@ model Chat {
   name      String?   // null for 1-1 chats
   isGroup   Boolean   @default(false)
   createdAt DateTime  @default(now())
-
+  updatedAt DateTime  @updatedAt
   // Relations
   participants ChatParticipant[]
   messages     Message[]
@@ -57,7 +57,7 @@ model Message {
   content     String?
   messageType String   @default("text") // text, image, file
   createdAt   DateTime @default(now())
-
+  updatedAt   DateTime @updatedAt
   // Relations
   chat   Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender User? @relation(fields: [senderId], references: [id], onDelete: SetNull)

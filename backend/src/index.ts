@@ -1,8 +1,8 @@
-
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRoute from './routes/auth.route.ts';
+import chatrouter from './routes/chat.route.ts';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import {SocketIo} from './lib/socket.ts';
@@ -36,6 +36,7 @@ const io = new Server(server, {
 
 
 app.use('/api/auth', authRoute);
+app.use("/api/u",chatrouter)
 
 async function startServer() {
   try {

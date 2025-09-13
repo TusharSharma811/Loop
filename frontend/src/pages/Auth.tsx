@@ -25,7 +25,7 @@ export const AuthPage: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, fetchUser } = useAuthStore();
+  const { isAuthenticated, fetchUser , setIsAuthenticated} = useAuthStore();
   useEffect(() => {
     if (isAuthenticated) {
       fetchUser();
@@ -39,6 +39,7 @@ export const AuthPage: React.FC = () => {
       setIsSignUp(true);
     } else {
       setIsSignUp(false);
+      navigate("/auth/signin");
     }
   }, [location]);
   const onBack = () => {
@@ -72,7 +73,11 @@ export const AuthPage: React.FC = () => {
       setIsLoading(false);
 
       if (response.ok) {
+        
+        localStorage.setItem("isAuthenticated", "true");
+        setIsAuthenticated(true)
         fetchUser();
+        
         onAuthSuccess();
       } else {
         console.error("Authentication failed:", data);
@@ -341,7 +346,7 @@ export const AuthPage: React.FC = () => {
             <p className="text-gray-600">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
               <button
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => (setIsSignUp(!isSignUp), navigate(isSignUp ? "/auth/signin" : "/auth/signup"))}
                 className="text-blue-600 hover:text-blue-500 font-medium"
               >
                 {isSignUp ? "Sign in" : "Sign up"}

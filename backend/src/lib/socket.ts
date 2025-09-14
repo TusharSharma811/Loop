@@ -1,44 +1,73 @@
-import { publisher , subscriber } from "./redisClient.ts";
-import{ Server ,Socket } from "socket.io";
+import { publisher, subscriber } from "./redisClient.ts";
+import { Server, Socket } from "socket.io";
 import prisma from "./prismaClient.ts";
 export class SocketIo {
+  io: Server;
+  private socket: Socket | null = null;
+  isSubscribed = false;
+  constructor(io: Server) {
+    this.io = io;
+  }
+  async init() {
+    this.io.on("connection", (socket: any) => {
+      console.log("New client connected", socket.id);
+      this.socket = socket;
+      socket.on("joinRoom", (roomId: string) => {
+        socket.join(roomId);
+        console.log(`Socket ${socket.id} joined room ${roomId}`);
+      });
+      socket.on("leaveRoom", (roomId: string) => {
+        socket.leave(roomId);
+        console.log(`Socket ${socket.id} left room ${roomId}`);
+      });
 
-    io: Server;
-    private socket: Socket | null = null;
-    isSubscribed = false;
-    constructor(io: Server) {
-        this.io = io;
-    }
-    async init() {
-        
+    
 
-        this.io.on("connection", (socket: any) => {
-            console.log("New client connected" , socket.id);
-            this.socket = socket;
+      socket.on(
+        "NewMessage",
+        async (message: {
+          id?: string;
+          chatId: string;
+          senderId: string;
+          content: string;
+          timestamp: Date;
+          messageType: string;
+          statuses: string[];
+        }) => {
+          if (!message.content || !message.chatId || !message.senderId) {
+            console.error("Invalid message data");
+            return;
+          }
+          const NewMessage = await prisma.message.create({
+            data: {
+              chatId: message.chatId,
+              senderId: message.senderId,
+              content: message.content,
+              timeStamp: new Date(),
+              messageType: message.messageType,
+            },
+          });
 
-            socket.on("NewMessage", async ({ message , chatId , userId } :{ message: string , chatId: string , userId: string }) => {
-                const data = JSON.parse(message);
-                if (!data.text || !chatId || !userId) {
-                    console.error("Invalid message data");
-                    return;
-                }
-                // const newMessage = await prisma.message.create({
-                //     data:{
-                //         content: data.text,
-                //     }
-              
-                await publisher.publish("chat", JSON.stringify({ message, chatId, userId }));
-            });
-            socket.on("disconnect", () => {
-                console.log("Client disconnected" , socket.id);
-            });
-        });
-        if (!this.isSubscribed) { 
-            await subscriber.subscribe("chat", (message) => {
-            const data = JSON.parse(message);
-            this.socket?.emit("NewMessage", data);
+          await publisher.publish(
+            "chat",
+            JSON.stringify({
+              message: NewMessage,
+              chatId: message.chatId,
+              userId: message.senderId,
+            })
+          );
+        }
+      );
+      socket.on("disconnect", () => {
+        console.log("Client disconnected", socket.id);
+      });
+    });
+    if (!this.isSubscribed) {
+      await subscriber.subscribe("chat", (message) => {
+        const data = JSON.parse(message);
+        this.socket?.to(data.chatId).emit("chat-message", data);
       });
       this.isSubscribed = true;
     }
-    }
+  }
 }

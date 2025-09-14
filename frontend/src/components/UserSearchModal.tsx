@@ -1,85 +1,87 @@
+import { useState, useEffect, useCallback } from "react";
+import { Search, X, MessageCircle, Users } from "lucide-react";
+import useSearchUserStore from "../store/searchUserStore";
+import useChatStore from "../store/chatStore";
 
-
-import { useState, useEffect, useCallback } from "react"
-import { Search, X, MessageCircle, Users } from "lucide-react"
-import useSearchUserStore from "../store/searchUserStore"
-import useChatStore from "../store/chatStore"
-
-
-import type {User} from "../store/userStore" ;
+import type { User } from "../store/userStore";
 
 interface UserSearchModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSelectUser: (user: User) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSelectUser: (user: User) => void;
 }
 
-
-export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchModalProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const { setModalClose , searchResults , searchUsers } = useSearchUserStore()
-  const { createChat } = useChatStore() ;
+export function UserSearchModal({
+  isOpen,
+  onClose,
+  onSelectUser,
+}: UserSearchModalProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const { setModalClose, searchResults, searchUsers } = useSearchUserStore();
+  const { createChat } = useChatStore();
   const filteredUsers = useCallback(async () => {
     if (!searchQuery.trim()) return searchResults;
-    const query = searchQuery.toLowerCase()
-    await searchUsers(query)
-
-  }, [searchQuery])
+    const query = searchQuery.toLowerCase();
+    await searchUsers(query);
+  }, [searchQuery]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-        filteredUsers()
-    }, 300)
+      filteredUsers();
+    }, 300);
 
-    return () => clearTimeout(timeout)
-  }, [searchQuery, filteredUsers])
+    return () => clearTimeout(timeout);
+  }, [searchQuery, filteredUsers]);
 
   const handleStartChat = async (user: User) => {
     try {
       await createChat([user.id], false);
       setModalClose(false);
-      console.log('Chat started successfully');
+      console.log("Chat started successfully");
     } catch (error) {
-      console.error('Error starting chat:', error);
+      console.error("Error starting chat:", error);
     }
   };
 
   const handleSelectUser = (user: User) => {
-    onSelectUser(user)
-    onClose()
-    setSearchQuery("")
-  }
+    onSelectUser(user);
+    onClose();
+    setSearchQuery("");
+  };
 
   const handleClose = () => {
-    setModalClose(false)
-    onClose()
-    setSearchQuery("")
-  }
+    setModalClose(false);
+    onClose();
+    setSearchQuery("");
+  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        handleClose()
+        handleClose();
       }
-    }
+    };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "hidden"
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "unset"
-    }
-  }, [isOpen])
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={handleClose}
+      />
 
       {/* Modal Content */}
       <div className="relative bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] flex flex-col">
@@ -116,13 +118,15 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
         {/* User List */}
         <div className="flex-1 overflow-y-auto p-4">
           <div className="space-y-2">
-            {searchResults.length === 0 ? (
+            {!searchResults || searchResults.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">{searchQuery ? "No users found" : "No users available"}</p>
+                <p className="text-sm">
+                  {searchQuery ? "No users found" : "No users available"}
+                </p>
               </div>
             ) : (
-              searchResults.map((user : User) => (
+              searchResults.map((user: User) => (
                 <div
                   key={user.id}
                   className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group"
@@ -156,7 +160,9 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
                   {/* User Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 dark:text-white truncate">{user.fullname}</p>
+                      <p className="font-medium text-gray-900 dark:text-white truncate">
+                        {user.fullname}
+                      </p>
                       {/* {user.isOnline && (
                         <span className="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
                           Online
@@ -170,7 +176,10 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
                   </div>
 
                   {/* Chat Button */}
-                  <button onClick={() => handleStartChat(user)} className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1">
+                  <button
+                    onClick={() => handleStartChat(user)}
+                    className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-1"
+                  >
                     <MessageCircle className="h-4 w-4" />
                     Chat
                   </button>
@@ -181,5 +190,5 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,6 +1,7 @@
 // socketStore.ts
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
+import useMessageStore, {type  Message } from "./messageStore";
 
 type SocketStore = {
   socket: Socket | null;
@@ -30,6 +31,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     // Example listener
     socket.on("chat-message", (msg) => {
       console.log("📩 New message:", msg);
+      const messageStore = useMessageStore.getState();
+      messageStore.addMessage(msg.message as Message);
     });
 
     set({ socket });

@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
 import { Send, Paperclip, Smile, Mic } from 'lucide-react';
+import useMessageStore from '../store/messageStore';
+import { useSocketStore } from '../store/socketStore';
+import useUserStore from '../store/userStore';
 
 interface MessageInputProps {
-  onSendMessage: (content: string) => void;
   disabled?: boolean;
+  conversationId?: string;
+  
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({ 
-  onSendMessage, 
   disabled = false 
+  , conversationId
 }) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-
+  const sendMessage = useMessageStore((state) => state.sendMessage);
+  const { socket } = useSocketStore();
+  const { user: currentUser } = useUserStore();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !disabled) {
-      onSendMessage(message.trim());
+      sendMessage(socket, conversationId, message.trim(), 'text', currentUser?.id);
       setMessage('');
     }
   };

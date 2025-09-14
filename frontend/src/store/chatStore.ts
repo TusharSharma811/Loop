@@ -1,19 +1,17 @@
 import { create } from "zustand";
 import api from "../lib/axiosInstance";
+import type { User } from "./userStore";
 
 
 
-export interface Participant {
-  id: string;
-  name: string;
-}
+
 
 export interface Chat {
   id: string;
   name: string;
   lastMessage?: string;
   updatedAt: string;
-  participants: Participant[];
+  participants: User[];
   isGroup: boolean;
   groupName?: string;
 }
@@ -42,13 +40,13 @@ const useChatStore = create<ChatStore>((set) => ({
   fetchChats: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await api.get("/u/users/chats");
+      const response = await api.get("/u/user/chats");
 
-      if (!response.data.ok) {
-        throw new Error("Failed to fetch chats");
-      }
+      // if (!response.data.ok) {
+      //   throw new Error("Failed to fetch chats");
+      // }
 
-      const data: Chat[] = response.data.data;
+      const data: Chat[] = response.data;
       set({ chats: data, loading: false });
     } catch (error) {
       set({
@@ -65,7 +63,9 @@ const useChatStore = create<ChatStore>((set) => ({
       if(!response.data.ok){
         throw new Error("Failed to create chat");
       }
-      const newChat: Chat = response.data.data;
+      const newChat: Chat = response.data;
+      console.log("New Chat Created:", newChat);
+      
       set((state) => ({ chats: [...state.chats, newChat] }));
     } catch (error) {
       set({

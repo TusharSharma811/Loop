@@ -1,13 +1,15 @@
 import React from 'react';
 import { Phone, Video, MoreVertical, Menu } from 'lucide-react';
-import type { Conversation } from '../types';
-
+import type { Chat } from '../store/chatStore';
+import useUserStore from '../store/userStore';
+import defaultAvatar from '../assets/default-avatar.png';
 interface ChatHeaderProps {
-  conversation: Conversation | null;
+  conversation: Chat | null;
   onSidebarToggle: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({ conversation, onSidebarToggle }) => {
+   const { user } = useUserStore();
   if (!conversation) {
     return (
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
@@ -22,19 +24,20 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ conversation, onSidebarT
       </div>
     );
   }
+ 
 
   const getConversationName = () => {
     if (conversation.isGroup && conversation.groupName) {
       return conversation.groupName;
     }
-    return conversation.participants[0]?.name || 'Unknown';
+    return conversation.participants.filter(p => p.id !== user?.id)[0]?.fullname || 'Unknown';
   };
 
   const getConversationAvatar = () => {
     if (conversation.isGroup && conversation.groupAvatar) {
       return conversation.groupAvatar;
     }
-    return conversation.participants[0]?.avatar || '';
+    return conversation.participants.filter(p => p.id !== user?.id)[0]?.avatarUrl || defaultAvatar;
   };
 
   const getStatusText = () => {

@@ -6,14 +6,17 @@ import { useEffect } from 'react';
 import ProtectedRoute from './components/ProtectRoutes';
 import PublicRouteWrapper from './components/PublicRouteWrapper';
 import useUserStore from './store/userStore';
+import { useSocketStore } from './store/socketStore';
 
 
 function App() {
 
   const { fetchUser } = useUserStore();
+  const { connect } = useSocketStore();
   useEffect(() => {
     fetchUser();
-  }, [fetchUser]);
+    connect();
+  }, [fetchUser , connect]);
 
   const router = createBrowserRouter([
     {

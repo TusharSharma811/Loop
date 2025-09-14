@@ -1,7 +1,8 @@
 import React from 'react';
 import { Check, CheckCheck } from 'lucide-react';
-import type { Message, User } from '../types';
-import { currentUser } from '../utils/MockData';
+import type { Message } from '../store/messageStore';
+import type { User } from '../store/userStore';
+
 import useUserStore from '../store/userStore';
 interface MessageBubbleProps {
   message: Message;
@@ -24,7 +25,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   const getStatusIcon = () => {
     if (!isOwn) return null;
     
-    switch (message.status) {
+    switch (message.statuses.filter(s => s === 'read').length > 0 ? 'read' : message.statuses.filter(s => s === 'delivered').length > 0 ? 'delivered' : 'sent') {
       case 'sent':
         return <Check className="h-4 w-4 text-gray-400" />;
       case 'delivered':
@@ -42,8 +43,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div className="mr-3">
           {showAvatar ? (
             <img
-              src={sender?.avatar || user?.fullname.charAt(0).toUpperCase()}
-              alt={sender?.name || 'User'}
+              src={sender?.avatarUrl || user?.fullname.charAt(0).toUpperCase()}
+              alt={sender?.fullname || 'User'}
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
@@ -55,7 +56,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
         {!isOwn && showAvatar && (
           <span className="text-xs text-gray-500 mb-1 px-3">
-            {sender?.name}
+            {sender?.fullname}
           </span>
         )}
         
@@ -82,8 +83,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div className="ml-3">
           {showAvatar ? (
             <img
-              src={currentUser.avatar}
-              alt={currentUser.name}
+              src={user?.avatarUrl || user?.fullname.charAt(0).toUpperCase()}
+              alt={user?.fullname || 'User'}
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (

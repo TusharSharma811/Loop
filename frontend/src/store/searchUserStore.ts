@@ -19,11 +19,11 @@ const useSearchUserStore = create<SearchUserStore>((set) => ({
     setModalClose: (isOpen: boolean) => set({ modalOpen: isOpen }),
     searchUsers : async (query: string) => {
         try {
-            const response = await api.get(`/u/users/search?query=${query}`);
-            if (!response.data.ok) {
+            const response = await api.get(`/u/search?q=${query}`);
+            if (!response.data) {
                 throw new Error("Failed to search users");
             }
-            set({ searchResults: response.data.users });
+            set({ searchResults: response.data });
         } catch (error) {
             console.error("Error searching users:", error);
         }

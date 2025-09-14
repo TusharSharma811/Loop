@@ -1,24 +1,24 @@
 import React, { useEffect, useRef } from 'react';
 import { MessageBubble } from './MessageCard';
 import { MessageInput } from './MessageInput';
-import type { Message, User, Conversation } from '../types';
-import { currentUser } from '../utils/MockData';
-
+import type { User } from '../store/userStore';
+import type { Chat as Conversation } from '../store/chatStore';
+import type { Message } from '../store/messageStore';
+import useMessageStore from '../store/messageStore';
+import useUserStore from '../store/userStore';
 interface ChatAreaProps {
   conversation: Conversation | null;
-  messages: Message[];
   users: User[];
-  onSendMessage: (content: string) => void;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
   conversation,
-  messages,
-  users,
-  onSendMessage
+  users
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  const activeUser: User = users[0]; // Assuming the first user is the current user
+  const { user: currentUser } = useUserStore();
+  const { messages } = useMessageStore();
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
@@ -30,7 +30,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   }, [messages]);
 
   const getUserById = (userId: string): User | undefined => {
-    if (userId === currentUser.id) return currentUser;
+    if (userId === currentUser?.id) return currentUser;
     return users.find(user => user.id === userId);
   };
 
@@ -62,10 +62,9 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
               <p className="text-sm text-gray-400">Start the conversation!</p>
             </div>
           </div>
-        ) : (
-          messages.map((message, index) => {
+        ) : ( messages.length > 0 && messages.map((message, index) => {
             const sender = getUserById(message.senderId);
-            const isOwn = message.senderId === currentUser.id;
+            const isOwn = message.senderId === currentUser?.id;
             const prevMessage = index > 0 ? messages[index - 1] : null;
             const showAvatar = !prevMessage || prevMessage.senderId !== message.senderId;
 
@@ -96,7 +95,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
       </div>
 
       {/* Message Input */}
-      <MessageInput onSendMessage={onSendMessage} disabled={!conversation} />
+      <MessageInput conversationId={conversation.id} disabled={!conversation} />
     </div>
   );
 };

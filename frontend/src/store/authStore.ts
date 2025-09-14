@@ -15,16 +15,13 @@ const useAuthStore = create<AuthState>((set) => ({
   checkAuth: async () => {
     try {
       const res = await api.get("/auth/verify");
-
-      if (res.data.ok) {
-        const data = res.data.data;
-        if (data.valid) {
-          set({ isAuthenticated: true });
-          return;
-        }
+      if(res.data.valid){
+        set({ isAuthenticated: true });
+        return;
       }
 
-
+      console.log("User is not authenticated");
+      
       set({ isAuthenticated: false });
     } catch (err) {
       console.error("Auth check failed", err);

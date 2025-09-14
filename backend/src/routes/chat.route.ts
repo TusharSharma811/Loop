@@ -6,7 +6,7 @@ import { protectRoutes } from "../middlewares/protectRoutes.ts";
 const router = Router();
 
 router.get("/user/chats", protectRoutes, getChatsofUser);
-router.get("/search/users", protectRoutes, getUsersByUsernameOrFullname);
+router.get("/search", protectRoutes, getUsersByUsernameOrFullname);
 router.post("/create/chat", protectRoutes, createChat);
 
 export default router;

@@ -1,5 +1,6 @@
 
 import { create } from "zustand";
+import api from "../lib/axiosInstance";
 
 export interface Message {
   id?: string;
@@ -27,20 +28,13 @@ export interface MessageStore {
   clearMessages: () => set({ messages: [] }),
   fetchMessages: async (conversationId) => {
     try {
-      const response = await fetch(
-        `/api/u/conversations/${conversationId}/messages`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      if (!response.ok) {
+      const response = await api.get(`/u/get-messages/${conversationId}`);
+      if(!response) {
         throw new Error("Failed to fetch messages");
       }
-      const data = await response.json();
+      console.log("Fetched messages:", response.data);
+      
+      const data: Message[] = response.data.messages;
       set({ messages: data });
     } catch (error) {
       console.error("Error fetching messages:", error);

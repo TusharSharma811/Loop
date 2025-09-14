@@ -14,7 +14,7 @@ export const getChatsofUser = async (req: RequestWithUser, res: Response) => {
       include: {
         participants: {
           include: {
-            user: { select: { id: true, username: true, fullname: true } }
+            user: { select: { id: true, username: true, fullname: true, avatarUrl: true } }
           }
         },
         messages: {
@@ -24,6 +24,8 @@ export const getChatsofUser = async (req: RequestWithUser, res: Response) => {
             id: true,
             content: true,
             createdAt: true,
+            timeStamp: true,
+            
             sender: { select: { id: true, username: true } }
           }
         }

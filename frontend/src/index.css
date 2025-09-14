@@ -13,3 +13,9 @@
   --shadow-glow-secondary: 0 0 80px rgba(93, 45, 230, 0.7);
   --inset-shadow-glow-secondary: inset 0 0 100px 150px rgba(93, 45, 230, 0.5);
 }
+
+@layer utilities{
+  .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+}

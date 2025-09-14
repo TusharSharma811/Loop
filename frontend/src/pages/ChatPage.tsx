@@ -7,27 +7,32 @@ import useChatStore from "../store/chatStore";
 import useSearchUserStore from "../store/searchUserStore";
 import { UserSearchModal } from "../components/UserSearchModal";
 import useUserStore from "../store/userStore";
-
+import { useSocketStore } from "../store/socketStore";
 
 export const ChatPage: React.FC = () => {
   const { fetchChats, chats } = useChatStore();
   const { modalOpen } = useSearchUserStore();
   const { loading, user } = useUserStore();
-   useEffect(() => {
-    fetchChats();
-  }, [fetchChats]);
-  const { id } = useParams<{ id: string }>();
-  useEffect(() => {
-    if (id) {
-      setActiveConversationId(id);
-    }
-  }, [id]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
    const activeConversation = chats && chats.length > 0 ? chats.find((c) => c.id === activeConversationId) || null : null;
 
   // Fetch chats only once
+   useEffect(() => {
+    fetchChats();
+  }, [fetchChats]);
+  useEffect(() => {
+    useSocketStore.getState().sendMessage("joinRoom", activeConversationId);
+  }, [activeConversationId]);
+  const { chat } = useParams<{ chat: string }>();
+  useEffect(() => {
+    if (chat) {
+      console.log("Setting active conversation ID from URL:", chat);
+      setActiveConversationId(chat);
+    }
+  }, [chat]);
+  
   useEffect(() => {
     if (chats && chats.length === 0) {
       fetchChats();

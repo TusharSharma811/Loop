@@ -29,10 +29,6 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
     }
   }, [messages]);
 
-  const getUserById = (userId: string): User | undefined => {
-    if (userId === currentUser?.id) return currentUser;
-    return users.find(user => user.id === userId);
-  };
 
   if (!conversation) {
     return (
@@ -52,9 +48,9 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-[80%] ">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-1 bg-gray-50">
+      <div className="flex-1  overflow-y-auto no-scrollbar p-4 space-y-1 bg-gray-50">
         {messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -62,8 +58,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
               <p className="text-sm text-gray-400">Start the conversation!</p>
             </div>
           </div>
-        ) : ( messages.length > 0 && messages.map((message, index) => {
-            const sender = getUserById(message.senderId);
+        ) : ( messages && messages.length > 0 && messages.map((message, index) => {
+            const sender = message.senderId === activeUser.id ? activeUser : users.find(u => u.id === message.senderId);
             const isOwn = message.senderId === currentUser?.id;
             const prevMessage = index > 0 ? messages[index - 1] : null;
             const showAvatar = !prevMessage || prevMessage.senderId !== message.senderId;
@@ -83,7 +79,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
       </div>
 
       {/* Typing indicator */}
-      <div className="px-4 py-2 bg-gray-50">
+      {/* <div className="px-4 py-2 bg-gray-50">
         <div className="flex items-center space-x-2 opacity-0">
           <div className="flex space-x-1">
             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
@@ -92,7 +88,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
           </div>
           <span className="text-sm text-gray-500">Someone is typing...</span>
         </div>
-      </div>
+      </div> */}
 
       {/* Message Input */}
       <MessageInput conversationId={conversation.id} disabled={!conversation} />

@@ -4,6 +4,9 @@ import { ConversationItem } from "./ConversationItem";
 import useSearchUserStore from "../store/searchUserStore";
 import useUserStore from "../store/userStore";
 import type { Chat } from "../store/chatStore";
+import { useSocketStore } from "../store/socketStore";
+import { useNavigate } from "react-router-dom";
+import useMessageStore from "../store/messageStore";
 
 interface SidebarProps {
   conversations: Chat[];
@@ -22,14 +25,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { setModalOpen } = useSearchUserStore();
+  const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
+  const { sendMessage } = useSocketStore();
   console.log("Conversations in Sidebar:", conversations);
   console.log("Active user ID:", user);
 
   const filteredConversations = conversations.filter((conv) => {
     const name =
       (conv.isGroup && conv.groupName) ||
-      conv.participants.map((p) => p.name).join(", ") ||
+      conv.participants.map((p) => p.fullname).join(", ") ||
       "Unknown Chat";
     return name.toLowerCase().includes(searchQuery.toLowerCase());
   });
@@ -109,8 +114,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 conversation={conversation}
                 isActive={activeConversationId === conversation.id}
                 onClick={() => {
+                  sendMessage("joinRoom", conversation.id as string);
                   onConversationSelect(conversation.id);
-                  if (window.innerWidth < 1024) onToggle(); // close sidebar on mobile
+                  useMessageStore.getState().fetchMessages(conversation.id as string);
+                  navigate(`/chat/${conversation.id}`); 
                 }}
               />
             ))

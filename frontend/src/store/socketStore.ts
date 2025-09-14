@@ -33,6 +33,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       console.log("📩 New message:", msg);
       const messageStore = useMessageStore.getState();
       messageStore.addMessage(msg.message as Message);
+      console.log("Updated messages:", messageStore.messages);
+      
     });
 
     set({ socket });
@@ -49,6 +51,8 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   sendMessage: (event, data) => {
     const socket = get().socket;
     if (socket) {
+      console.log("📤 Emitting event:", event, data);
+      
       socket.emit(event, data);
     } else {
       console.warn("⚠️ Socket not connected");

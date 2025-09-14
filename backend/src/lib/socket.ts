@@ -47,7 +47,8 @@ export class SocketIo {
               messageType: message.messageType,
             },
           });
-
+          console.log("Message saved:", NewMessage);
+          
           await publisher.publish(
             "chat",
             JSON.stringify({
@@ -65,7 +66,9 @@ export class SocketIo {
     if (!this.isSubscribed) {
       await subscriber.subscribe("chat", (message) => {
         const data = JSON.parse(message);
-        this.socket?.to(data.chatId).emit("chat-message", data);
+        console.log("Publishing to rooms:", data.chatId);
+        
+        this.io?.to(data.chatId).emit("chat-message", data);
       });
       this.isSubscribed = true;
     }

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Check, CheckCheck } from 'lucide-react';
 import type { Message } from '../store/messageStore';
 import type { User } from '../store/userStore';
-
+import defaultImage from '../assets/default-avatar.png';
 import useUserStore from '../store/userStore';
 interface MessageBubbleProps {
   message: Message;
@@ -18,24 +17,24 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   showAvatar
 }) => {
   const formatTime = (date: Date) => {
+    if (!isOwn) return null;
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   const user = useUserStore((state) => state.user);
 
-  const getStatusIcon = () => {
-    if (!isOwn) return null;
+  // const getStatusIcon = () => {
     
-    switch (message.statuses.filter(s => s === 'read').length > 0 ? 'read' : message.statuses.filter(s => s === 'delivered').length > 0 ? 'delivered' : 'sent') {
-      case 'sent':
-        return <Check className="h-4 w-4 text-gray-400" />;
-      case 'delivered':
-        return <CheckCheck className="h-4 w-4 text-gray-400" />;
-      case 'read':
-        return <CheckCheck className="h-4 w-4 text-blue-500" />;
-      default:
-        return null;
-    }
-  };
+  //   switch ( message && message.statuses.filter(s => s === 'read').length > 0 ? 'read' : message.statuses.filter(s => s === 'delivered').length > 0 ? 'delivered' : 'sent') {
+  //     case 'sent':
+  //       return <Check className="h-4 w-4 text-gray-400" />;
+  //     case 'delivered':
+  //       return <CheckCheck className="h-4 w-4 text-gray-400" />;
+  //     case 'read':
+  //       return <CheckCheck className="h-4 w-4 text-blue-500" />;
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   return (
     <div className={`flex items-end mb-4 ${isOwn ? 'justify-end' : 'justify-start'}`}>
@@ -43,7 +42,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div className="mr-3">
           {showAvatar ? (
             <img
-              src={sender?.avatarUrl || user?.fullname.charAt(0).toUpperCase()}
+              src={ sender?.avatarUrl && sender?.avatarUrl != "" ? sender?.avatarUrl : defaultImage}
               alt={sender?.fullname || 'User'}
               className="w-8 h-8 rounded-full object-cover"
             />
@@ -69,13 +68,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           shadow-sm
         `}>
           <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-          
+{/*           
           <div className={`flex items-center justify-end mt-1 space-x-1 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
             <span className="text-xs opacity-75">
               {formatTime(message.timestamp)}
             </span>
             {getStatusIcon()}
-          </div>
+          </div> */}
         </div>
       </div>
       
@@ -83,7 +82,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <div className="ml-3">
           {showAvatar ? (
             <img
-              src={user?.avatarUrl || user?.fullname.charAt(0).toUpperCase()}
+              src={user?.avatarUrl &&user?.avatarUrl != "" ? user?.avatarUrl : defaultImage}
               alt={user?.fullname || 'User'}
               className="w-8 h-8 rounded-full object-cover"
             />

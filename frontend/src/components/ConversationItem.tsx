@@ -1,7 +1,7 @@
 import React from "react";
 import type { Chat } from "../store/chatStore";
 import useUserStore from "../store/userStore";
-
+import defaultImage from '../assets/default-avatar.png';
 interface ConversationItemProps {
   conversation: unknown;
   isActive: boolean;
@@ -22,7 +22,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
       return conversation.groupName;
     }
     return (
-      conversation.participants.find((p) => p.id !== currentUser?.id)?.username ||
+      conversation.participants.find((p) => p.id !== currentUser?.id)?.fullname ||
       "Unknown"
     );
   };
@@ -31,10 +31,8 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
     if (conversation.isGroup && conversation.groupAvatar) {
       return conversation.groupAvatar;
     }
-    return (
-      conversation.participants.find((p) => p.id !== currentUser?.id)?.avatar ||
-      ""
-    );
+    const otherParticipant = conversation.participants.find((p) => p.id !== currentUser?.id);
+    return otherParticipant?.avatarUrl != "" ? defaultImage : otherParticipant?.avatarUrl ;
   };
 
   const getLastMessagePreview = () => {

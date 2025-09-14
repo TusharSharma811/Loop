@@ -13,6 +13,7 @@ export interface Message {
 }
 
 export interface MessageStore {
+  loading: boolean;
   messages: Message[];
   setMessages: (messages: Message[]) => void;
   addMessage: (message: Message) => void;
@@ -21,6 +22,7 @@ export interface MessageStore {
   sendMessage: (io: any, conversationId: string, content: string, messageType: string, senderId: string) => Promise<void>;
 }
   const useMessageStore = create<MessageStore>((set) => ({
+    loading: false,
   messages: [] as Message[],
   setMessages: (messages) => set({ messages }),
   addMessage: (message) =>
@@ -28,6 +30,7 @@ export interface MessageStore {
   clearMessages: () => set({ messages: [] }),
   fetchMessages: async (conversationId) => {
     try {
+      set({ loading: true });
       const response = await api.get(`/u/get-messages/${conversationId}`);
       if(!response) {
         throw new Error("Failed to fetch messages");
@@ -35,7 +38,7 @@ export interface MessageStore {
       console.log("Fetched messages:", response.data);
       
       const data: Message[] = response.data.messages;
-      set({ messages: data });
+      set({ messages: data , loading: false });
     } catch (error) {
       console.error("Error fetching messages:", error);
     }

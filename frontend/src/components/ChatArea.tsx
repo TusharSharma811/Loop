@@ -6,6 +6,7 @@ import type { Chat as Conversation } from '../store/chatStore';
 import type { Message } from '../store/messageStore';
 import useMessageStore from '../store/messageStore';
 import useUserStore from '../store/userStore';
+import ChatAppSkeleton from './skeletons/ChatLoading';
 interface ChatAreaProps {
   conversation: Conversation | null;
   users: User[];
@@ -19,6 +20,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   const activeUser: User = users[0]; // Assuming the first user is the current user
   const { user: currentUser } = useUserStore();
   const { messages } = useMessageStore();
+  const {loading} = useMessageStore();
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
@@ -58,7 +60,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
               <p className="text-sm text-gray-400">Start the conversation!</p>
             </div>
           </div>
-        ) : ( messages && messages.length > 0 && messages.map((message, index) => {
+        ) : (loading ? <ChatAppSkeleton /> :( messages && messages.length > 0 &&
+           messages.map((message, index) => {
             const sender = message.senderId === activeUser.id ? activeUser : users.find(u => u.id === message.senderId);
             const isOwn = message.senderId === currentUser?.id;
             const prevMessage = index > 0 ? messages[index - 1] : null;
@@ -73,7 +76,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 showAvatar={showAvatar}
               />
             );
-          })
+          }))
         )}
         <div ref={messagesEndRef} />
       </div>

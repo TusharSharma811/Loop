@@ -8,17 +8,24 @@ import useSearchUserStore from "../store/searchUserStore";
 import { UserSearchModal } from "../components/UserSearchModal";
 import useUserStore from "../store/userStore";
 import { useSocketStore } from "../store/socketStore";
-
+import ChatAppSkeleton from "../components/skeletons/ChatLoading";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 export const ChatPage: React.FC = () => {
   const { fetchChats, chats } = useChatStore();
   const { modalOpen } = useSearchUserStore();
   const { loading, user } = useUserStore();
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const navigate = useNavigate();
+  const location = useLocation();
    const activeConversation = chats && chats.length > 0 ? chats.find((c) => c.id === activeConversationId) || null : null;
+  useEffect(() => {
+    if(!activeConversationId && location.pathname !== "/chat" ) {
+      navigate("/chat");
+    }
+  }, [activeConversationId, navigate , location.pathname]);
 
-  // Fetch chats only once
    useEffect(() => {
     fetchChats();
   }, [fetchChats]);
@@ -50,9 +57,7 @@ export const ChatPage: React.FC = () => {
   return (
     <>
       {loading ? (
-        <div className="flex justify-center items-center h-screen">
-          <div className="loader">Loading...</div>
-        </div>
+       <ChatAppSkeleton />
       ) : (
         <div className="flex overflow-hidden relative h-screen bg-gray-100">
           <div className="flex h-screen">

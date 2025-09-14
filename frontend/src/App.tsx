@@ -8,15 +8,16 @@ import PublicRouteWrapper from './components/PublicRouteWrapper';
 import useUserStore from './store/userStore';
 import { useSocketStore } from './store/socketStore';
 
-
 function App() {
-
-  const { fetchUser } = useUserStore();
+   
+  const { fetchUser, user } = useUserStore();
   const { connect } = useSocketStore();
+  
   useEffect(() => {
-    fetchUser();
+    if (!user) fetchUser();
     connect();
-  }, [fetchUser , connect]);
+
+  }, [fetchUser, connect,  user]);
 
   const router = createBrowserRouter([
     {
@@ -30,7 +31,9 @@ function App() {
     },
     {
       path: "/chat",
-      element: <ProtectedRoute><ChatPage /></ProtectedRoute>,
+      element: <ProtectedRoute>
+        <ChatPage />
+        </ProtectedRoute>,
       children: [
         {
           path: ":chatId",

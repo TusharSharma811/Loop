@@ -3,7 +3,7 @@ import type { Chat } from "../store/chatStore";
 import useUserStore from "../store/userStore";
 import defaultImage from '../assets/default-avatar.png';
 interface ConversationItemProps {
-  conversation: unknown;
+  conversation: Chat;
   isActive: boolean;
   onClick: () => void;
 }
@@ -14,8 +14,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   onClick,
 } ) => {
   const { user: currentUser } = useUserStore();
-  console.log("Current User in ConversationItem:", currentUser);
-  console.log("Current User in ConversationItem:", conversation);
+  console.log(conversation.lastMessage);
   
   const getConversationName = () => {
     if (conversation.isGroup && conversation.groupName) {
@@ -103,7 +102,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
           </h3>
           {conversation.lastMessage && (
             <span className="text-xs text-gray-500 ml-2">
-              {formatTime(new Date(conversation.lastMessage.timestamp))}
+              {formatTime(new Date(conversation.lastMessage.timeStamp))}
             </span>
           )}
         </div>

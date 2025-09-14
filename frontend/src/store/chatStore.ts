@@ -1,15 +1,14 @@
 import { create } from "zustand";
 import api from "../lib/axiosInstance";
 import type { User } from "./userStore";
-
-
+import type { Message } from "./messageStore";
 
 
 
 export interface Chat {
   id: string;
   name: string;
-  lastMessage?: string;
+  lastMessage?: Message;
   updatedAt: string;
   participants: User[];
   isGroup: boolean;

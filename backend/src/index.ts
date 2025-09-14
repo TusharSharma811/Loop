@@ -8,6 +8,9 @@ import { Server } from 'socket.io';
 import {SocketIo} from './lib/socket.ts';
 import { publisher , subscriber } from './lib/redisClient.ts';
 import messageRouter from './routes/message.route.ts';
+import callRouter from './routes/call.route.ts';
+
+import { v4 as uuidv4 } from "uuid";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,6 +41,7 @@ const io = new Server(server, {
 app.use('/api/auth', authRoute);
 app.use("/api/u",chatrouter)
 app.use("/api/u",messageRouter)
+app.use("/api/calls", callRouter);
 async function startServer() {
   try {
     const PORT = process.env.PORT || 3000;

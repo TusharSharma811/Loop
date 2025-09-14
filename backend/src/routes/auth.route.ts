@@ -7,7 +7,7 @@ const router = Router();
 router.post("/login" , login);
 router.post("/register" , register);
 router.post("/logout" , logout);
-router.get("/refresh-token" , refreshToken);
+router.post("/refresh-token" , refreshToken);
 router.get("/google-login" , googleLogin);
 router.get("/google-login/callback" , googleLoginCallback);
 router.get("/verify", protectRoutes, verify);

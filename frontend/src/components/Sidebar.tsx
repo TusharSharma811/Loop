@@ -22,14 +22,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { setModalOpen } = useSearchUserStore();
-  const user  = useUserStore((state) => state.user);
+  const user = useUserStore((state) => state.user);
   console.log("Conversations in Sidebar:", conversations);
   console.log("Active user ID:", user);
-  
-  
+
   const filteredConversations = conversations.filter((conv) => {
     const name =
-      conv.groupName ||
+      (conv.isGroup && conv.groupName) ||
       conv.participants.map((p) => p.name).join(", ") ||
       "Unknown Chat";
     return name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -50,7 +49,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         className={`fixed lg:relative inset-y-0 left-0 z-20
           w-80 bg-white border-r border-gray-200 
           transform transition-transform duration-300 ease-in-out 
-          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} h-full flex flex-col`}
+          ${
+            isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          } h-full flex flex-col [scrollbar-gutter:none]`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">

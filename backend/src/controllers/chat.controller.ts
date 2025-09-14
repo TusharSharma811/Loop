@@ -63,12 +63,12 @@ export const getUsersByUsernameOrFullname = async (req: RequestWithUser, res: Re
         ],
       },
     });
-    users.map(u => {
-      if(u.id === userId) return ;
+    const usersWithoutPassword = users.filter(u => {
+      if (u.id === userId) return false;
       u.passwordHash = "";
-      return u;
+      return true;
     });
-    res.status(200).json(users);
+    res.status(200).json(usersWithoutPassword);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -1,6 +1,9 @@
 import { log } from 'console';
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 export interface RequestWithUser extends Request {
     user?: { userId: string };
@@ -20,6 +23,7 @@ export const protectRoutes  = async (req: RequestWithUser, res: Response, next: 
 } catch (error) {
     console.error("Error protecting routes", error);
     if (error instanceof Error && error.name === "TokenExpiredError") {
+
       return res.status(401).json({ message: "Token expired" });
     }
     return res.status(401).json({ message: "Invalid token" });

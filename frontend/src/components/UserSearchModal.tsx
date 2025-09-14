@@ -17,22 +17,13 @@ interface UserSearchModalProps {
 
 export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState("")
-  const { setModalClose , setSearchResults , searchResults} = useSearchUserStore()
-  const {addChat} = useChatStore() ;
+  const { setModalClose , searchResults , searchUsers } = useSearchUserStore()
+  const { createChat } = useChatStore() ;
   const filteredUsers = useCallback(async () => {
     if (!searchQuery.trim()) return searchResults;
     const query = searchQuery.toLowerCase()
-    const res = await fetch(`/api/u/search/users?q=${query}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    if (!res.ok) {
-      throw new Error('Failed to fetch users');
-    }
-    const data = await res.json();
-    console.log(data);
-    
-    setSearchResults(data);
+    await searchUsers(query)
+
   }, [searchQuery])
 
   useEffect(() => {
@@ -45,21 +36,9 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
 
   const handleStartChat = async (user: User) => {
     try {
-      const response = await fetch('/api/u/create/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ participantIds: [user.id], isGroup: false  }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to start chat');
-      }
-      const data = await response.json();
-      addChat(data);
-      setModalClose(false) ;
-      console.log('Chat started successfully:', data);
+      await createChat([user.id], false);
+      setModalClose(false);
+      console.log('Chat started successfully');
     } catch (error) {
       console.error('Error starting chat:', error);
     }
@@ -152,9 +131,9 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
                   {/* Avatar */}
                   <div className="relative">
                     <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                      {user.avatarUrl ? (
+                      {user.avatarUrl != null ? (
                         <img
-                          src={user.avatarUrl || "/placeholder.svg"}
+                          src={user.avatarUrl || ""}
                           alt={user.fullname}
                           className="h-full w-full object-cover"
                         />

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import api from "../lib/axiosInstance";
 
 interface AuthState {
   isAuthenticated: boolean | null; // null = unknown
@@ -13,28 +14,16 @@ const useAuthStore = create<AuthState>((set) => ({
 
   checkAuth: async () => {
     try {
-      const res = await fetch("/api/auth/verify", { credentials: "include" });
+      const res = await api.get("/auth/verify");
 
-      if (res.ok) {
-        const data = await res.json();
+      if (res.data.ok) {
+        const data = res.data.data;
         if (data.valid) {
           set({ isAuthenticated: true });
           return;
         }
       }
 
-      // If access token invalid → try refresh
-      const refreshRes = await fetch("/api/auth/refresh-token", { 
-       method:"GET",
-        credentials: "include" 
-      });
-      if (refreshRes.ok) {
-        const data = await refreshRes.json();
-        if (data.valid) {
-          set({ isAuthenticated: true });
-          return;
-        }
-      }
 
       set({ isAuthenticated: false });
     } catch (err) {

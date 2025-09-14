@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import api from "../lib/axiosInstance";
 
 
 
@@ -13,6 +14,8 @@ export interface Chat {
   lastMessage?: string;
   updatedAt: string;
   participants: Participant[];
+  isGroup: boolean;
+  groupName?: string;
 }
 
 
@@ -24,6 +27,7 @@ type ChatStore = {
   addChat: (chat: Chat) => void;
   clearChats: () => void;
   fetchChats: () => Promise<void>;
+  createChat: (participantIds: string[], isGroup: boolean, groupName?: string) => Promise<void>;
 };
 
 const useChatStore = create<ChatStore>((set) => ({
@@ -38,17 +42,13 @@ const useChatStore = create<ChatStore>((set) => ({
   fetchChats: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await fetch("/api/u/user/chats", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // include cookies for auth
-      });
+      const response = await api.get("/u/users/chats");
 
-      if (!response.ok) {
+      if (!response.data.ok) {
         throw new Error("Failed to fetch chats");
       }
 
-      const data: Chat[] = await response.json();
+      const data: Chat[] = response.data.data;
       set({ chats: data, loading: false });
     } catch (error) {
       set({
@@ -56,6 +56,23 @@ const useChatStore = create<ChatStore>((set) => ({
         loading: false,
       });
       console.error("Error fetching chats:", error);
+    }
+  },
+  createChat: async (participantIds: string[], isGroup: boolean, groupName?: string) => {
+    try{
+      const response = await api.post("/u/create/chat", { participantIds, isGroup, groupName });
+
+      if(!response.data.ok){
+        throw new Error("Failed to create chat");
+      }
+      const newChat: Chat = response.data.data;
+      set((state) => ({ chats: [...state.chats, newChat] }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : "Unknown error",
+        loading: false,
+      });
+      console.error("Error creating chat:", error);
     }
   },
 }));

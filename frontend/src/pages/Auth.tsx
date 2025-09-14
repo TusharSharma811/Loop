@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
+import useUserStore from "../store/userStore";
 
 export const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -25,7 +26,8 @@ export const AuthPage: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, fetchUser , setIsAuthenticated} = useAuthStore();
+  const { isAuthenticated,  setIsAuthenticated} = useAuthStore();
+  const { fetchUser } = useUserStore();
   useEffect(() => {
     if (isAuthenticated) {
       fetchUser();

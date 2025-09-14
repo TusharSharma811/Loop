@@ -23,10 +23,17 @@ function App() {
     {
       path: "/auth/:mode",
       element: <PublicRouteWrapper><AuthPage  /></PublicRouteWrapper>,
+
     },
     {
       path: "/chat",
       element: <ProtectedRoute><ChatPage /></ProtectedRoute>,
+      children: [
+        {
+          path: ":chatId",
+          element: <ChatPage />,
+        },
+      ],
     },
   ]);
 

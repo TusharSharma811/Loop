@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import api from "../lib/axiosInstance";
 
 type SearchUserStore = {
     searchResults: [];
@@ -6,6 +7,7 @@ type SearchUserStore = {
     modalOpen: boolean;
     setModalOpen: (isOpen: boolean) => void;
     setModalClose: (isOpen: boolean) => void;
+    searchUsers: (query: string) => Promise<void>;
 };
 
 
@@ -15,6 +17,17 @@ const useSearchUserStore = create<SearchUserStore>((set) => ({
     modalOpen: false,
     setModalOpen: (isOpen: boolean) => set({ modalOpen: isOpen }),
     setModalClose: (isOpen: boolean) => set({ modalOpen: isOpen }),
+    searchUsers : async (query: string) => {
+        try {
+            const response = await api.get(`/u/users/search?query=${query}`);
+            if (!response.data.ok) {
+                throw new Error("Failed to search users");
+            }
+            set({ searchResults: response.data.users });
+        } catch (error) {
+            console.error("Error searching users:", error);
+        }
+    }
 }));
 
 export default useSearchUserStore;

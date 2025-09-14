@@ -63,13 +63,11 @@ export const register = async (req: Request, res: Response) => {
     res.cookie("token", accesstoken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite:"none",
       maxAge: 15 * 60 * 1000,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite:"none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.status(201).json({ message: "User created successfully", user: { id: user.id, email: user.email, username: user.username } });
@@ -108,13 +106,11 @@ export const refreshToken = (req: Request, res: Response) => {
     res.cookie("token", accesstoken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite:"none",
       maxAge: 15 * 60 * 1000,
     });
     res.cookie("refreshToken", refreshTokenNew, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite:"none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.status(200).json({ message: "Token refreshed successfully", valid : true });

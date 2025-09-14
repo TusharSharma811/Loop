@@ -19,11 +19,15 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(scrollToBottom, [messages]);
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",        // 👈 stay at bottom of container
+        inline: "nearest"    // 👈 don’t scroll horizontally
+      });
+    }
+  }, [messages]);
 
   const getUserById = (userId: string): User | undefined => {
     if (userId === currentUser.id) return currentUser;
@@ -32,7 +36,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-gray-50">
+      <div className="flex-1 flex flex-col items-center justify-center bg-gray-500">
+        {/* empty state */}
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

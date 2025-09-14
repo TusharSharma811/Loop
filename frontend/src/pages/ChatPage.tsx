@@ -2,59 +2,55 @@ import { Sidebar } from "../components/Sidebar";
 import { ChatHeader } from "../components/ChatHeader";
 import { ChatArea } from "../components/ChatArea";
 import { messages as initialMessages, currentUser } from "../utils/MockData";
-import type { Message } from "../types";
+
 import { useEffect, useState } from "react";
 import useChatStore from "../store/chatStore";
-import useAuthStore from "../store/authStore";
 import useSearchUserStore from "../store/searchUserStore";
 import { UserSearchModal } from "../components/UserSearchModal";
+import useUserStore from "../store/userStore";
+import type { Message } from "../types"; // <-- recommend creating this
 
 export const ChatPage: React.FC = () => {
   const { fetchChats, chats } = useChatStore();
   const { modalOpen } = useSearchUserStore();
-  const { userLoading } = useAuthStore();
-  const [activeConversationId, setActiveConversationId] = useState<
-    string | null
-  >("1");
+  const { loading, user } = useUserStore();
+   useEffect(() => {
+    fetchChats();
+  }, [fetchChats]);
+
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const activeConversation =
-    chats.find((c) => c.id === activeConversationId) || null;
-  const [users, setUsers] = useState<any>([]);
-  const user = useAuthStore((state) => state.user);
-  useEffect(() => {
-   async function fetchData(){
-     await fetchChats();
-    setUsers(
-      chats.flatMap((chat) =>
-        chat.participants.filter((chatuser) => chatuser.id !== user.id)
-      )
-    );
-    console.log("Fetched chats:", chats);
-   }
-   fetchData();
-  }, [fetchChats]);
+
+  const activeConversation = chats.find((c) => c.id === activeConversationId) || null;
+
+  // Fetch chats only once
+ 
+
   const handleConversationSelect = (conversationId: string) => {
     setActiveConversationId(conversationId);
   };
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setSidebarOpen((prev) => !prev);
   };
+
   const handleSendMessage = (content: string) => {
     if (!activeConversationId) return;
 
     const newMessage: Message = {
       id: Date.now().toString(),
       senderId: currentUser.id,
+      conversationId: activeConversationId,
       content,
       timestamp: new Date(),
       type: "text",
       status: "sent",
     };
+
     setMessages((prev) => [...prev, newMessage]);
 
-    // Simulate message status updates
+    // Simulate delivery/read updates
     setTimeout(() => {
       setMessages((prev) =>
         prev.map((msg) =>
@@ -71,29 +67,32 @@ export const ChatPage: React.FC = () => {
       );
     }, 2000);
   };
+
   return (
     <>
-      {userLoading ? (
+      {loading ? (
         <div className="flex justify-center items-center h-screen">
           <div className="loader">Loading...</div>
         </div>
       ) : (
-        <div className="flex overflow-hidden relative h-screen bg-gray-100 ">
+        <div className="flex overflow-hidden relative h-screen bg-gray-100">
+          <div className="flex h-screen">
           <Sidebar
-            conversations={users}
+            conversations={chats}
             activeConversationId={activeConversationId}
             onConversationSelect={handleConversationSelect}
             isOpen={sidebarOpen}
             onToggle={toggleSidebar}
           />
+          </div>
           {modalOpen && (
             <UserSearchModal
               isOpen={modalOpen}
               onClose={() => {}}
               onSelectUser={() => {}}
-              users={users}
             />
           )}
+
           <div className="flex-1 flex flex-col min-w-0">
             <ChatHeader
               conversation={activeConversation}
@@ -102,10 +101,10 @@ export const ChatPage: React.FC = () => {
 
             <ChatArea
               conversation={activeConversation}
-              messages={messages.filter((m) => {
-                return activeConversationId === "1";
-              })}
-              users={users}
+              messages={messages.filter((m) => m.conversationId === activeConversationId)}
+              users={activeConversation?.participants.filter(
+                (chatUser) => chatUser.id !== user?.id
+              ) || []}
               onSendMessage={handleSendMessage}
             />
           </div>

@@ -1,16 +1,16 @@
 import { LandingPage } from './pages/Landing';
 import { AuthPage } from './pages/Auth';
-import useAuthStore from './store/authStore';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ChatPage } from './pages/ChatPage';
 import { useEffect } from 'react';
 import ProtectedRoute from './components/ProtectRoutes';
 import PublicRouteWrapper from './components/PublicRouteWrapper';
+import useUserStore from './store/userStore';
 
 
 function App() {
 
-  const {  fetchUser} = useAuthStore();
+  const { fetchUser } = useUserStore();
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);

@@ -6,7 +6,7 @@ type SocketStore = {
   socket: Socket | null;
   connect: () => void;
   disconnect: () => void;
-  sendMessage: (event: string, data: any) => void;
+  sendMessage: (event: string, data: unknown) => void;
 };
 
 export const useSocketStore = create<SocketStore>((set, get) => ({

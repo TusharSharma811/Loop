@@ -4,77 +4,21 @@ import { useState, useEffect, useCallback } from "react"
 import { Search, X, MessageCircle, Users } from "lucide-react"
 import useSearchUserStore from "../store/searchUserStore"
 import useChatStore from "../store/chatStore"
-import { useNavigate } from "react-router-dom"
 
-interface User {
-  id: string
-  name: string
-  username: string
-  avatar?: string
-  isOnline: boolean
-  lastSeen?: string
-}
+
+import type {User} from "../store/userStore" ;
 
 interface UserSearchModalProps {
   isOpen: boolean
   onClose: () => void
   onSelectUser: (user: User) => void
-  users?: User[]
 }
 
-// // Mock data for demonstration
-// const mockUsers: User[] = [
-//   {
-//     id: "1",
-//     name: "Alice Johnson",
-//     username: "alice_j",
-//     avatar: "/professional-woman.png",
-//     isOnline: true,
-//   },
-//   {
-//     id: "2",
-//     name: "Bob Smith",
-//     username: "bobsmith",
-//     avatar: "/casual-man.png",
-//     isOnline: false,
-//     lastSeen: "2 hours ago",
-//   },
-//   {
-//     id: "3",
-//     name: "Carol Davis",
-//     username: "carol_d",
-//     avatar: "/woman-friendly.jpg",
-//     isOnline: true,
-//   },
-//   {
-//     id: "4",
-//     name: "David Wilson",
-//     username: "dwilson",
-//     avatar: "/professional-man.png",
-//     isOnline: false,
-//     lastSeen: "1 day ago",
-//   },
-//   {
-//     id: "5",
-//     name: "Emma Brown",
-//     username: "emma_brown",
-//     avatar: "/creative-woman.png",
-//     isOnline: true,
-//   },
-//   {
-//     id: "6",
-//     name: "Frank Miller",
-//     username: "fmiller",
-//     avatar: "/man-with-beard.png",
-//     isOnline: false,
-//     lastSeen: "5 minutes ago",
-//   },
-// ]
 
 export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const { setModalClose , setSearchResults , searchResults} = useSearchUserStore()
-  const {chats,addChat } = useChatStore() ;
+  const {addChat} = useChatStore() ;
   const filteredUsers = useCallback(async () => {
     if (!searchQuery.trim()) return searchResults;
     const query = searchQuery.toLowerCase()
@@ -99,7 +43,6 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
     return () => clearTimeout(timeout)
   }, [searchQuery, filteredUsers])
 
-  const navigate = useNavigate() ;
   const handleStartChat = async (user: User) => {
     try {
       const response = await fetch('/api/u/create/chat', {
@@ -200,7 +143,7 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
                 <p className="text-sm">{searchQuery ? "No users found" : "No users available"}</p>
               </div>
             ) : (
-              searchResults.map((user) => (
+              searchResults.map((user : User) => (
                 <div
                   key={user.id}
                   className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer group"
@@ -209,9 +152,9 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
                   {/* Avatar */}
                   <div className="relative">
                     <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                      {user.avatar ? (
+                      {user.avatarUrl ? (
                         <img
-                          src={user.avatar || "/placeholder.svg"}
+                          src={user.avatarUrl || "/placeholder.svg"}
                           alt={user.fullname}
                           className="h-full w-full object-cover"
                         />
@@ -226,24 +169,24 @@ export function UserSearchModal({ isOpen, onClose, onSelectUser }: UserSearchMod
                       )}
                     </div>
                     {/* Online indicator */}
-                    {user.isOnline && (
+                    {/* {user.isOnline && (
                       <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full" />
-                    )}
+                    )} */}
                   </div>
 
                   {/* User Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 dark:text-white truncate">{user.name}</p>
-                      {user.isOnline && (
+                      <p className="font-medium text-gray-900 dark:text-white truncate">{user.fullname}</p>
+                      {/* {user.isOnline && (
                         <span className="text-xs px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full">
                           Online
                         </span>
-                      )}
+                      )} */}
                     </div>
                     <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       @{user.username}
-                      {!user.isOnline && user.lastSeen && <span className="ml-2">• Last seen {user.lastSeen}</span>}
+                      {/* {!user.isOnline && user.lastSeen && <span className="ml-2">• Last seen {user.lastSeen}</span>} */}
                     </p>
                   </div>
 

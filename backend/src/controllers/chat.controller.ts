@@ -4,7 +4,7 @@ import type { RequestWithUser } from "../middlewares/protectRoutes.ts";
 export const getChatsofUser = async (req: RequestWithUser, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ error: "Unauthorized" });
-    const userId = Number(req.user.userId);
+    const userId = req.user.userId
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
     const chats = await prisma.chat.findMany({
@@ -46,10 +46,10 @@ export const getChatsofUser = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-export const getUsersByUsernameOrFullname = async (req: Request, res: Response) => {
+export const getUsersByUsernameOrFullname = async (req: RequestWithUser, res: Response) => {
   const { query } = req;
   const searchTerm = query.q as string;
-
+  const userId = req.user?.userId;
   if (!searchTerm) {
     return res.status(400).json({ error: 'Search term is required' });
   }
@@ -63,7 +63,11 @@ export const getUsersByUsernameOrFullname = async (req: Request, res: Response) 
         ],
       },
     });
-
+    users.map(u => {
+      if(u.id === userId) return ;
+      u.passwordHash = "";
+      return u;
+    });
     res.status(200).json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -77,7 +81,7 @@ export const createChat = async (req: RequestWithUser, res: Response) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = Number(req.user.userId);
+    const userId = req.user.userId;
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
@@ -99,13 +103,33 @@ export const createChat = async (req: RequestWithUser, res: Response) => {
     if (!participantIds.includes(userId)) {
       participantIds.push(userId);
     }
+    const uniqueParticipantIds = Array.from(new Set(participantIds));
 
+    // For non-group chats, ensure exactly two participants
+    if (!isGroup && uniqueParticipantIds.length !== 2) {
+      return res.status(400).json({ error: "One-on-one chats must have exactly two participants" });
+    }
+    const checkChat = await prisma.chat.findFirst({
+      where: {
+        isGroup: false,
+        participants: {
+          every: {
+            userId: {
+              in: uniqueParticipantIds
+            }
+          }
+        }
+      }
+    });
+    if (checkChat) {
+      return res.status(200).json(checkChat);
+    }
     const newChat = await prisma.chat.create({
       data: {
         isGroup: Boolean(isGroup),
         name: isGroup ? groupName : null,
         participants: {
-          create: participantIds.map((id: number) => ({
+          create: participantIds.map((id: string) => ({
             user: { connect: { id } }, // ✅ Connect user via ChatParticipant
             role: id === userId ? "admin" : "member"
           }))
@@ -132,13 +156,13 @@ export const getChatById = async (req: RequestWithUser, res: Response) => {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const userId = Number(req.user.userId);
+    const userId = req.user.userId
     if (!userId) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const chatId = Number(req.params.id);
-    if (isNaN(chatId)) {
+    const chatId = req.params.id
+    if (!chatId) {
       return res.status(400).json({ error: "Invalid chat ID" });
     }
 

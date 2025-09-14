@@ -22,15 +22,11 @@ export class SocketIo {
                     console.error("Invalid message data");
                     return;
                 }
-                
-                await prisma.message.create({
-                    data: {
-                        chatId: parseInt(chatId),
-                        senderId: parseInt(userId),
-                        content: data.text,
-
-                    }
-                });
+                // const newMessage = await prisma.message.create({
+                //     data:{
+                //         content: data.text,
+                //     }
+              
                 await publisher.publish("chat", JSON.stringify({ message, chatId, userId }));
             });
             socket.on("disconnect", () => {

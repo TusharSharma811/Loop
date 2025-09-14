@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { getMessages, deleteMessage } from "../controllers/message.controller";
-import { protectRoutes } from "../middlewares/protectRoutes";
+import { getMessages } from "../controllers/message.controller.ts";
+import { protectRoutes } from "../middlewares/protectRoutes.ts";
 const router = Router();
 
 
 router.get("/get-messages/:chatId" , protectRoutes, getMessages);
-router.delete("/delete-message/:messageId" , protectRoutes, deleteMessage);
+
 export default router;

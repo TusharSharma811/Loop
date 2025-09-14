@@ -12,21 +12,23 @@ datasource db {
 
 
 model User {
-  id          Int       @id @default(autoincrement())
+  id          String    @id @default(uuid())
   username    String    @unique
   fullname    String    @default("")
   email       String    @unique
   passwordHash String
+  avatarUrl   String?   // URL to profile picture
+  bio         String?   // Short user bio
   createdAt   DateTime  @default(now())
 
   // Relations
-  chatParticipants ChatParticipant[]
-  messages         Message[]
-  messageStatuses  MessageStatus[]
+  contacts ChatParticipant[]
+  messages  Message[]
+  messageStatuses MessageStatus[]
 }
 
 model Chat {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid())
   name      String?   // null for 1-1 chats
   isGroup   Boolean   @default(false)
   createdAt DateTime  @default(now())
@@ -37,9 +39,9 @@ model Chat {
 }
 
 model ChatParticipant {
-  id       Int      @id @default(autoincrement())
-  chatId   Int
-  userId   Int
+  id       String    @id @default(uuid())
+  chatId   String
+  userId   String
   role     String   @default("member") // admin, member
   joinedAt DateTime @default(now())
 
@@ -51,9 +53,9 @@ model ChatParticipant {
 }
 
 model Message {
-  id          Int      @id @default(autoincrement())
-  chatId      Int
-  senderId    Int?
+  id          String   @id @default(uuid())
+  chatId      String
+  senderId    String?
   content     String?
   messageType String   @default("text") // text, image, file
   createdAt   DateTime @default(now())
@@ -65,9 +67,9 @@ model Message {
 }
 
 model MessageStatus {
-  id        Int      @id @default(autoincrement())
-  messageId Int
-  userId    Int
+  id        String   @id @default(uuid())
+  messageId String
+  userId    String
   status    String   @default("delivered") // sent, delivered, read
   updatedAt DateTime @default(now())
 
@@ -80,10 +82,10 @@ model MessageStatus {
 
 
 model CallSession {
-  id          Int      @id @default(autoincrement())
-  chatId      Int
-  initiatorId Int
-  receiverId  Int
+  id          String   @id @default(uuid())
+  chatId      String
+  initiatorId String
+  receiverId  String
   callType    String   // audio, video
   status      String   @default("initiated") // initiated, ringing, in_progress, ended
   startedAt   DateTime @default(now())

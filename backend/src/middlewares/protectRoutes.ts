@@ -9,6 +9,8 @@ export interface RequestWithUser extends Request {
 export const protectRoutes  = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try{
     const token = req.cookies.token;
+    console.log("Token from cookies:", token);
+    
     if (!token) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -17,6 +19,9 @@ export const protectRoutes  = async (req: RequestWithUser, res: Response, next: 
     next();
 } catch (error) {
     console.error("Error protecting routes", error);
-    return res.status(500).json({ message: 'Internal server error' });
+    if (error instanceof Error && error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired" });
+    }
+    return res.status(401).json({ message: "Invalid token" });
 }
 }

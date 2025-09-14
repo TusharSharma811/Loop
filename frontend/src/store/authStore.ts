@@ -24,7 +24,10 @@ const useAuthStore = create<AuthState>((set) => ({
       }
 
       // If access token invalid → try refresh
-      const refreshRes = await fetch("/api/auth/refresh-token", { credentials: "include" });
+      const refreshRes = await fetch("/api/auth/refresh-token", { 
+       method:"GET",
+        credentials: "include" 
+      });
       if (refreshRes.ok) {
         const data = await refreshRes.json();
         if (data.valid) {

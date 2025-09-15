@@ -12,7 +12,7 @@ export const getToken = async (req: RequestWithUser, res: Response) => {
     const userId = req.user?.userId;
     if (!userId) return res.status(401).json({ error: "Unauthorized" });
     const token = client.generateUserToken({ user_id: userId });
-
+    console.log("Generated token for user:", userId , token);
     res.json({ token, apiKey });
   } catch (error) {
     console.error("Error generating token:", error);

@@ -2,6 +2,8 @@ import { Phone, Video, MoreVertical, Menu } from "lucide-react";
 import useUserStore from "../store/userStore";
 import type { Chat } from "../store/chatStore";
 import defaultAvatar from "../assets/default-avatar.png";
+
+
 interface Props {
   conversation: Chat | null;
   onSidebarToggle: () => void;
@@ -12,6 +14,7 @@ export const ChatHeader: React.FC<Props> = ({
   onSidebarToggle,
 }) => {
   const { user } = useUserStore();
+  
 
   if (!conversation) {
     return (
@@ -61,10 +64,16 @@ export const ChatHeader: React.FC<Props> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+          <button
+            className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
+            onClick={() => alert("Calling feature coming soon!")}
+          >
             <Phone className="h-5 w-5" />
           </button>
-          <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">
+          <button
+            className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"
+            onClick={() => alert("Video feature coming soon!")}
+          >
             <Video className="h-5 w-5" />
           </button>
           <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full">

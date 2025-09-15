@@ -5,7 +5,7 @@ import authRoute from './routes/auth.route.ts';
 import chatrouter from './routes/chat.route.ts';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import {SocketIo} from './lib/socket.ts';
+import {SocketIo} from './services/socketService.ts';
 import { publisher , subscriber } from './lib/redisClient.ts';
 import messageRouter from './routes/message.route.ts';
 import callRouter from './routes/call.route.ts';

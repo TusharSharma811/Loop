@@ -4,6 +4,6 @@ import { protectRoutes } from '../middlewares/protectRoutes.ts';
 
 const router = Router();
 
-router.post('/get-token', protectRoutes, getToken);
+router.get('/get-token', protectRoutes, getToken);
 
 export default router;

@@ -1,6 +1,6 @@
-import { publisher, subscriber } from "./redisClient.ts";
+import { publisher, subscriber } from "../lib/redisClient.ts";
 import { Server, Socket } from "socket.io";
-import prisma from "./prismaClient.ts";
+import prisma from "../lib/prismaClient.ts";
 export class SocketIo {
   io: Server;
   private socket: Socket | null = null;
@@ -57,6 +57,16 @@ export class SocketIo {
               userId: message.senderId,
             })
           );
+
+          await publisher.publish(
+            `notifications:${message.chatId}`,
+            JSON.stringify({
+              message: NewMessage,
+              chatId: message.chatId,
+              userId: message.senderId,
+            })
+          );
+
         }
       );
       socket.on("disconnect", () => {
@@ -69,6 +79,11 @@ export class SocketIo {
         console.log("Publishing to rooms:", data.chatId);
         
         this.io?.to(data.chatId).emit("chat-message", data);
+      });
+      await subscriber.subscribe("notifications:*", (message, channel) => {
+        const data = JSON.parse(message);
+
+        this.io?.to(data.chatId).emit("notification", data);
       });
       this.isSubscribed = true;
     }

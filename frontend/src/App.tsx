@@ -1,39 +1,51 @@
-import { LandingPage } from './pages/Landing';
-import { AuthPage } from './pages/Auth';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { ChatPage } from './pages/ChatPage';
-import { useEffect } from 'react';
-import ProtectedRoute from './components/ProtectRoutes';
-import PublicRouteWrapper from './components/PublicRouteWrapper';
-import useUserStore from './store/userStore';
-import { useSocketStore } from './store/socketStore';
+import { LandingPage } from "./pages/Landing";
+import { AuthPage } from "./pages/Auth";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { ChatPage } from "./pages/ChatPage";
+import { useEffect} from "react";
+import ProtectedRoute from "./components/ProtectRoutes";
+import PublicRouteWrapper from "./components/PublicRouteWrapper";
+import useUserStore from "./store/userStore";
+import { useSocketStore } from "./store/socketStore";
 
 function App() {
-   
   const { fetchUser, user } = useUserStore();
   const { connect } = useSocketStore();
-  
-  useEffect(() => {
-    if (!user) fetchUser();
-    connect();
 
-  }, [fetchUser, connect,  user]);
+
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+    connect();
+  }, [user, fetchUser, connect]);
+  
 
   const router = createBrowserRouter([
     {
       path: "/",
-      element:<PublicRouteWrapper><LandingPage  /></PublicRouteWrapper>,
+      element: (
+        <PublicRouteWrapper>
+          <LandingPage />
+        </PublicRouteWrapper>
+      ),
     },
     {
       path: "/auth/:mode",
-      element: <PublicRouteWrapper><AuthPage  /></PublicRouteWrapper>,
-
+      element: (
+        <PublicRouteWrapper>
+          <AuthPage />
+        </PublicRouteWrapper>
+      ),
     },
     {
       path: "/chat",
-      element: <ProtectedRoute>
-        <ChatPage />
-        </ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+              <ChatPage />
+            
+        </ProtectedRoute>
+      ),
       children: [
         {
           path: ":chatId",
@@ -43,13 +55,10 @@ function App() {
     },
   ]);
 
-
-
- 
   return (
-   <>
-   <RouterProvider router={router} />
-   </>
+    <>
+      <RouterProvider router={router} />
+    </>
   );
 }
 

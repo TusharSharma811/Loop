@@ -11,8 +11,7 @@ import { useSocketStore } from "../store/socketStore";
 import ChatAppSkeleton from "../components/skeletons/ChatLoading";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { IncomingCallModal } from "../components/IncomingCallModal";
-import { CallerPreviewModal } from "../components/CallerPreview";
+import { motion } from "motion/react";
 export const ChatPage: React.FC = () => {
   const { fetchChats, chats } = useChatStore();
   const { modalOpen } = useSearchUserStore();
@@ -35,7 +34,7 @@ export const ChatPage: React.FC = () => {
 
   useEffect(() => {
     fetchChats();
-  }, [fetchChats]);
+  }, [fetchChats , chats]);
   useEffect(() => {
     useSocketStore.getState().sendMessage("joinRoom", activeConversationId);
   }, [activeConversationId]);
@@ -66,7 +65,7 @@ export const ChatPage: React.FC = () => {
       {loading ? (
         <ChatAppSkeleton />
       ) : (
-        <div className="flex overflow-hidden relative h-screen bg-gray-100">
+        <motion.div initial={{ opacity: 0.5 }} animate={{ opacity: 1 }} className="flex overflow-hidden relative h-screen bg-gray-100">
           <div className="flex h-screen">
             <Sidebar
               conversations={chats || []}
@@ -89,8 +88,7 @@ export const ChatPage: React.FC = () => {
               conversation={activeConversation}
               onSidebarToggle={toggleSidebar}
             />
-             <CallerPreviewModal />
-  <IncomingCallModal />
+
             <ChatArea
               conversation={activeConversation}
               users={
@@ -100,7 +98,7 @@ export const ChatPage: React.FC = () => {
               }
             />
           </div>
-        </div>
+        </motion.div>
       )}
     </>
   );

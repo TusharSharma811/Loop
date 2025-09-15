@@ -14,10 +14,11 @@ function App() {
 
 
   useEffect(() => {
-    if (!user) {
-      fetchUser();
+    const init = async () => {
+      if(!user)await fetchUser();
+      connect();
     }
-    connect();
+    init();
   }, [user, fetchUser, connect]);
   
 

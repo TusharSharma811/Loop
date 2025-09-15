@@ -1,7 +1,7 @@
 // socketStore.ts
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
-import useMessageStore, {type  Message } from "./messageStore";
+import useMessageStore, { type Message } from "./messageStore";
 
 type SocketStore = {
   socket: Socket | null;
@@ -14,9 +14,9 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   socket: null,
 
   connect: async () => {
-    if (get().socket) return; // already connected
+    if (get().socket) return; 
 
-    const socket =  io("http://localhost:3000", {
+    const socket = io("http://localhost:3000", {
       transports: ["websocket"],
     });
 
@@ -34,7 +34,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       const messageStore = useMessageStore.getState();
       messageStore.addMessage(msg.message as Message);
       console.log("Updated messages:", messageStore.messages);
-      
     });
 
     set({ socket });
@@ -52,7 +51,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     const socket = get().socket;
     if (socket) {
       console.log("📤 Emitting event:", event, data);
-      
+
       socket.emit(event, data);
     } else {
       console.warn("⚠️ Socket not connected");

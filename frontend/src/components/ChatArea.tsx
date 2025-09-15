@@ -24,7 +24,6 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
-        behavior: "smooth",
         block: "end",        // 👈 stay at bottom of container
         inline: "nearest"    // 👈 don’t scroll horizontally
       });

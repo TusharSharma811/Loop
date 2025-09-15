@@ -29,7 +29,7 @@ type ChatStore = {
 
 const useChatStore = create<ChatStore>((set) => ({
   chats: [],
-  loading: false,
+  loading: true,
   error: null,
 
   setChats: (chats) => set({ chats }),
@@ -40,11 +40,6 @@ const useChatStore = create<ChatStore>((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await api.get("/u/user/chats");
-
-      // if (!response.data.ok) {
-      //   throw new Error("Failed to fetch chats");
-      // }
-
       const data: Chat[] = response.data;
       set({ chats: data, loading: false });
     } catch (error) {
@@ -53,6 +48,9 @@ const useChatStore = create<ChatStore>((set) => ({
         loading: false,
       });
       console.error("Error fetching chats:", error);
+    }
+  finally {
+      set({ loading: false });
     }
   },
   createChat: async (participantIds: string[], isGroup: boolean, groupName?: string) => {
@@ -63,8 +61,6 @@ const useChatStore = create<ChatStore>((set) => ({
         throw new Error("Failed to create chat");
       }
       const newChat: Chat = response.data;
-      console.log("New Chat Created:", newChat);
-      
       set((state) => ({ chats: [...state.chats, newChat] }));
     } catch (error) {
       set({
@@ -72,6 +68,9 @@ const useChatStore = create<ChatStore>((set) => ({
         loading: false,
       });
       console.error("Error creating chat:", error);
+    }
+    finally {
+      set({ loading: false });
     }
   },
 }));

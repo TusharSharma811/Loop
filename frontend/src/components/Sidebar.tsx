@@ -3,7 +3,7 @@ import { Search, Plus, Settings, MessageCircle } from "lucide-react";
 import { ConversationItem } from "./ConversationItem";
 import useSearchUserStore from "../store/searchUserStore";
 import useUserStore from "../store/userStore";
-import type { Chat } from "../store/chatStore";
+import useChatStore, { type Chat} from "../store/chatStore";
 import { useSocketStore } from "../store/socketStore";
 import { useNavigate } from "react-router-dom";
 import useMessageStore from "../store/messageStore";
@@ -28,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
   const { sendMessage } = useSocketStore();
+  
   console.log("Conversations in Sidebar:", conversations);
   console.log("Active user ID:", user);
 
@@ -116,7 +117,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => {
                   sendMessage("joinRoom", conversation.id as string);
                   onConversationSelect(conversation.id);
+                  useMessageStore.getState().setMessages([]);
                   useMessageStore.getState().fetchMessages(conversation.id as string);
+                  
                   navigate(`/chat/${conversation.id}`); 
                 }}
               />

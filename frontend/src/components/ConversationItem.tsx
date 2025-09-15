@@ -14,7 +14,6 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   onClick,
 } ) => {
   const { user: currentUser } = useUserStore();
-  console.log(conversation.lastMessage);
   
   const getConversationName = () => {
     if (conversation.isGroup && conversation.groupName) {

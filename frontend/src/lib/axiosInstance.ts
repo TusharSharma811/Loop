@@ -1,4 +1,5 @@
 import axios, { AxiosError, type AxiosRequestConfig  } from "axios";
+import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
   baseURL: "/api", 
@@ -32,13 +33,12 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // call refresh endpoint, cookies will be sent automatically
         await api.post("/auth/refresh-token", {});
         processQueue(null, null);
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-
+        useNavigate()("/auth/login");
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

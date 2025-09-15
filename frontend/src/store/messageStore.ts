@@ -22,7 +22,7 @@ export interface MessageStore {
   sendMessage: (io: any, conversationId: string, content: string, messageType: string, senderId: string) => Promise<void>;
 }
   const useMessageStore = create<MessageStore>((set) => ({
-    loading: false,
+    loading: true,
   messages: [] as Message[],
   setMessages: (messages) => set({ messages }),
   addMessage: (message) =>
@@ -30,32 +30,29 @@ export interface MessageStore {
   clearMessages: () => set({ messages: [] }),
   fetchMessages: async (conversationId) => {
     try {
-      set({ loading: true });
       const response = await api.get(`/u/get-messages/${conversationId}`);
       if(!response) {
         throw new Error("Failed to fetch messages");
       }
       console.log("Fetched messages:", response.data);
-      
       const data: Message[] = response.data.messages;
-      set({ messages: data , loading: false });
+      set({ messages: data, loading: false });
     } catch (error) {
       console.error("Error fetching messages:", error);
+    }finally {
+      set({ loading: false });
     }
   },
   sendMessage: async (io , conversationId, content, messageType , senderId) => {
     try {
-      const message = {
+      const message: Message = {
         chatId: conversationId,
         senderId: senderId,
         content,
         messageType,
         timestamp: new Date(),
+        statuses: [], // or provide appropriate statuses if needed
       };
-      // Emit the message to the server via WebSocket
-      // await io.emit("sendMessage", message);
-      // Optimistically add the message to the store
-      // set((state) => ({ messages: [...state.messages, message] }));
       set((state) => ({ messages: [...state.messages, message] }));
       await io.emit("NewMessage", message);
     } catch (error) {

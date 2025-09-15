@@ -18,13 +18,13 @@ export function UserSearchModal({
 }: UserSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const { setModalClose, searchResults, searchUsers } = useSearchUserStore();
-  const { createChat } = useChatStore();
+  const { createChat  } = useChatStore();
   const filteredUsers = useCallback(async () => {
     if (!searchQuery.trim()) return searchResults;
     const query = searchQuery.toLowerCase();
     await searchUsers(query);
   }, [searchQuery]);
-
+ 
   useEffect(() => {
     const timeout = setTimeout(() => {
       filteredUsers();

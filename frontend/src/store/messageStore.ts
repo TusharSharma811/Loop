@@ -22,7 +22,7 @@ export interface MessageStore {
   sendMessage: (io: any, conversationId: string, content: string, messageType: string, senderId: string) => Promise<void>;
 }
   const useMessageStore = create<MessageStore>((set) => ({
-    loading: true,
+  loading: true,
   messages: [] as Message[],
   setMessages: (messages) => set({ messages }),
   addMessage: (message) =>
@@ -35,6 +35,7 @@ export interface MessageStore {
         throw new Error("Failed to fetch messages");
       }
       console.log("Fetched messages:", response.data);
+      await new Promise(resolve => setTimeout(resolve, 700)); // Simulate loading delay
       const data: Message[] = response.data.messages;
       set({ messages: data, loading: false });
     } catch (error) {

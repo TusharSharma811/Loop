@@ -4,8 +4,11 @@ import './index.css'
 import '@stream-io/video-react-sdk/dist/css/styles.css'
 import App from './App.tsx'
 
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    
     <App />
+    
   </StrictMode>,
 )

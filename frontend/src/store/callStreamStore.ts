@@ -3,18 +3,19 @@ import { create } from "zustand";
 import api from "../lib/axiosInstance";
 import { StreamVideoClient, Call } from "@stream-io/video-react-sdk";
 import useUserStore from "./userStore";
+import { use } from "react";
 
-interface IncomingCall { 
-  callId: string; 
-  callerId: string; 
+interface IncomingCall {
+  callId: string;
+  callerId: string;
   callerName?: string;
   callerAvatar?: string;
   isVideo: boolean;
 }
 
-interface OutgoingCall { 
-  callId: string; 
-  calleeId: string; 
+interface OutgoingCall {
+  callId: string;
+  calleeId: string;
   calleeName?: string;
   isVideo: boolean;
 }
@@ -24,7 +25,11 @@ export interface CallStreamStore {
   setClient: (client: StreamVideoClient) => void;
   clearClient: () => void;
   fetchClient: () => Promise<void>;
-  initiateCall: (calleeId: string, isVideo?: boolean, calleeName?: string) => Promise<void>;
+  initiateCall: (
+    calleeId: string,
+    isVideo?: boolean,
+    calleeName?: string
+  ) => Promise<void>;
   deleteCall: (callId: string) => Promise<void>;
 
   activeCall: Call | null;
@@ -51,7 +56,11 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
   clearClient: () => {
     const { client } = get();
     if (client) {
-      try { client.disconnectUser(); } catch (e) { console.warn(e); }
+      try {
+        client.disconnectUser();
+      } catch (e) {
+        console.warn(e);
+      }
     }
     set({
       client: null,
@@ -80,48 +89,6 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
       const newClient = new StreamVideoClient({ apiKey });
       await newClient.connectUser({ id: user.id }, token);
 
-      // Enhanced event handlers with proper types
-      newClient.on("call.ring", (event: { call?: unknown; user?: unknown; call_cid?: string }) => {
-        console.log("📞 call.ring event:", event);
-        const currentUserId = useUserStore.getState().user?.id;
-        const callerId = (event?.call as { created_by?: { id: string } })?.created_by?.id ?? (event?.user as { id: string })?.id;
-        const callId = (event?.call as { id: string })?.id ?? (event?.call_cid?.split?.(":")?.[1]);
-        const isVideo = (event?.call as { settings?: { video?: { enabled: boolean } } })?.settings?.video?.enabled || false;
-
-        if (!callId) return;
-        if (currentUserId && currentUserId !== callerId) {
-          set({ 
-            incomingCall: { 
-              callId, 
-              callerId,
-              callerName: (event?.call as { created_by?: { name: string } })?.created_by?.name || callerId,
-              isVideo
-            } 
-          });
-        }
-      });
-
-      newClient.on("call.accepted", (event: { call?: unknown }) => {
-        console.log("call.accepted:", event);
-        if (event?.call) {
-          set({ outgoingCall: null, activeCall: event.call as Call, isInCall: true });
-        }
-      });
-
-      newClient.on("call.rejected", (event: { call?: unknown }) => {
-        console.log("call.rejected:", event);
-        set({ outgoingCall: null, callError: "Call was rejected" });
-        setTimeout(() => set({ callError: null }), 3000);
-      });
-
-      newClient.on("call.ended", (event: { call?: unknown }) => {
-        console.log("call.ended:", event);
-        get().clearActiveCall();
-        get().clearIncomingCall();
-        get().clearOutgoingCall();
-        set({ isInCall: false });
-      });
-
       // helpful debug during dev
       newClient.on("all", (event: { type: string }) => {
         console.debug("Stream event:", event.type, event);
@@ -136,22 +103,35 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
   },
 
   // Enhanced initiate call with video support
-  initiateCall: async (calleeId: string, isVideo = false, calleeName?: string) => {
+  initiateCall: async (
+    calleeId: string,
+    isVideo = false,
+    calleeName?: string
+  ) => {
     const { client } = get();
     if (!client) throw new Error("No Stream client available");
-    
+
     try {
       const callId = `${Date.now()}-${calleeId}`;
-      const call = client.call("default", callId);
-      
+      const typeofCall = isVideo ? "default" : "audio_room";
+      const call = client.call(typeofCall, callId);
+
       await call.getOrCreate({
         data: {
           members: [
             { user_id: useUserStore.getState().user?.id || "", role: "admin" },
-            { user_id: calleeId, role: "user" }
-          ]
+            { user_id: calleeId, role: "admin" },
+          ],
+          custom: {
+            callerInfo : useUserStore.getState().user ? {
+              id: useUserStore.getState().user?.id,
+              name: useUserStore.getState().user?.fullname,
+              avatar: useUserStore.getState().user?.avatarUrl,
+            } : {},
+          }
         },
-        ring: true
+        ring: true,
+        video: isVideo,
       });
 
       // Enable video if requested
@@ -160,16 +140,11 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
       }
       await call.microphone.enable();
 
-      set({ 
-        outgoingCall: { 
-          callId: call.id, 
-          calleeId, 
-          calleeName,
-          isVideo 
-        },
+      set({
         activeCall: call,
-        callError: null
+        callError: null,
       });
+      console.log("Outgoing call initiated:", get().outgoingCall);
     } catch (error) {
       console.error("Failed to initiate call:", error);
       set({ callError: "Failed to start call" });
@@ -182,8 +157,16 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
     if (!client) return;
     try {
       const call = client.call("default", callId);
-      try { await call.leave(); } catch (e) { console.warn("Failed leaving call", e); }
-      try { await call.delete(); } catch (e) { console.warn("Failed deleting call", e); } 
+      try {
+        await call.leave();
+      } catch (e) {
+        console.warn("Failed leaving call", e);
+      }
+      try {
+        await call.delete();
+      } catch (e) {
+        console.warn("Failed deleting call", e);
+      }
     } catch (e) {
       console.warn("Failed deleting call", e);
     } finally {

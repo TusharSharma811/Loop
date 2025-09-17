@@ -51,7 +51,6 @@ const InnerModal: React.FC = () => {
     setIsAccepting(true);
     try {
       await call.accept();
-      await call.join();
       navigate(`/call/${call.id}`, { replace: true }); 
     } catch (err) {
       console.error("Error accepting call: ", err);

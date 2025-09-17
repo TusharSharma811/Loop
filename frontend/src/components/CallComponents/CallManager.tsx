@@ -4,14 +4,22 @@ import OutgoingCallModal from "./OutgoingCallModal";
 import { useCalls, CallingState } from "@stream-io/video-react-sdk";
 import { useCallStreamStore } from "../../store/callStreamStore";
 
-export const CallManager = ({ onNavigateToCall }: { onNavigateToCall: (callId: string) => void }) => {
+export const CallManager = ({
+  onNavigateToCall,
+}: {
+  onNavigateToCall: (callId: string) => void;
+}) => {
   const calls = useCalls();
   const client = useCallStreamStore((state) => state.client);
   const activeCall = useCallStreamStore((state) => state.activeCall);
   const setActiveCall = useCallStreamStore((state) => state.setActiveCall);
   const clearActiveCall = useCallStreamStore((state) => state.clearActiveCall);
-  const clearIncomingCall = useCallStreamStore((state) => state.clearIncomingCall);
-  const clearOutgoingCall = useCallStreamStore((state) => state.clearOutgoingCall);
+  const clearIncomingCall = useCallStreamStore(
+    (state) => state.clearIncomingCall
+  );
+  const clearOutgoingCall = useCallStreamStore(
+    (state) => state.clearOutgoingCall
+  );
 
   useEffect(() => {
     if (!client) return;
@@ -34,13 +42,27 @@ export const CallManager = ({ onNavigateToCall }: { onNavigateToCall: (callId: s
       client.off("call.accepted", handleAccepted);
       client.off("call.ended", handleEnded);
     };
-  }, [client, onNavigateToCall, clearActiveCall, clearIncomingCall, clearOutgoingCall]);
+  }, [
+    client,
+    onNavigateToCall,
+    clearActiveCall,
+    clearIncomingCall,
+    clearOutgoingCall,
+  ]);
 
   const incomingCalls = calls.filter(
     (call) =>
       !call.isCreatedByMe && call.state.callingState === CallingState.RINGING
   );
   const [incomingCall] = incomingCalls;
+  console.log(
+    "Rendering CallManager, calls:",
+    calls,
+    "incomingCall:",
+    incomingCall,
+    "activeCall:",
+    activeCall
+  );
 
   const outgoingCalls = calls.filter(
     (call) =>

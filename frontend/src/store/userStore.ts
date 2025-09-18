@@ -27,7 +27,7 @@ const useUserStore = create<UserStore>((set , get) => ({
     fetchUser: async () => {
       if (get().user) return; 
       try {
-        const response = await api.get('/auth/me');
+        const response = await api.get('/user/me');
         const data= response.data;
         set({ user: data.user , loading: false, error: null });
       } catch (error) {

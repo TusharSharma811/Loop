@@ -102,21 +102,20 @@ export const LandingPage: React.FC = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <MessageCircle className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">ChatApp</span>
+              <span className="ml-2 text-xl font-bold text-gray-900">LoopChat</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
-              <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Reviews</a>
+
               <button
                 onClick={() => navigate('/auth/signin')}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
               >
                 Sign In
               </button>
               <button
                 onClick={() => navigate('/auth/signup')}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
               >
                 Get Started
               </button>
@@ -140,7 +139,7 @@ export const LandingPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => navigate('/auth/signup')}
-                className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
               >
                 Start Chatting Free
                 <ArrowRight className="inline-block ml-2 h-5 w-5" />
@@ -247,57 +246,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-xl text-gray-600">
-              Choose the plan that's right for you
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {pricingPlans.map((plan, index) => (
-              <div key={index} className={`bg-white rounded-xl shadow-sm border-2 p-8 relative ${
-                plan.popular ? 'border-blue-500' : 'border-gray-200'
-              }`}>
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                <div className="text-center mb-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-500">/{plan.period}</span>
-                  </div>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center space-x-3">
-                      <Check className="h-5 w-5 text-green-500" />
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
-                  plan.popular 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                }`}>
-                  Get Started
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+     
 
       {/* CTA Section */}
       <section className="py-16">
@@ -312,7 +261,7 @@ export const LandingPage: React.FC = () => {
             onClick={() => navigate('/auth/signup')}
             className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
           >
-            Start Your Free Trial
+            Join now
             <ArrowRight className="inline-block ml-2 h-5 w-5" />
           </button>
         </div>
@@ -325,7 +274,7 @@ export const LandingPage: React.FC = () => {
             <div>
               <div className="flex items-center mb-4">
                 <MessageCircle className="h-8 w-8 text-blue-400" />
-                <span className="ml-2 text-xl font-bold">ChatApp</span>
+                <span className="ml-2 text-xl font-bold">LoopChat</span>
               </div>
               <p className="text-gray-400">
                 The future of messaging, designed for everyone.

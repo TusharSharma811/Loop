@@ -13,6 +13,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 import useUserStore from "../store/userStore";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const AuthPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -26,16 +28,17 @@ export const AuthPage: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated,  setIsAuthenticated} = useAuthStore();
+  const { isAuthenticated, setIsAuthenticated } = useAuthStore();
   const { fetchUser } = useUserStore();
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchUser();
       navigate("/chat");
     }
   }, [isAuthenticated, navigate, fetchUser]);
+
   const location = window.location.pathname;
-  console.log(location);
   useEffect(() => {
     if (location.includes("signup")) {
       setIsSignUp(true);
@@ -43,11 +46,14 @@ export const AuthPage: React.FC = () => {
       setIsSignUp(false);
       navigate("/auth/signin");
     }
-  }, [location]);
+  }, [location, navigate]);
+
   const onBack = () => {
     navigate("/");
   };
+
   const onAuthSuccess = () => {
+    toast.success("✅ Authentication successful!");
     navigate("/chat");
   };
 
@@ -63,7 +69,7 @@ export const AuthPage: React.FC = () => {
     setIsLoading(true);
     try {
       const endpoint = isSignUp ? "/auth/register" : "/auth/login";
-      const response = await fetch(`/api${endpoint}`, {
+      const response = await fetch(`/api/v1${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,25 +81,25 @@ export const AuthPage: React.FC = () => {
       setIsLoading(false);
 
       if (response.ok) {
-        
         localStorage.setItem("isAuthenticated", "true");
-        setIsAuthenticated(true)
+        setIsAuthenticated(true);
         fetchUser();
-        
         onAuthSuccess();
       } else {
-        console.error("Authentication failed:", data);
+        toast.error(data?.message || "❌ Authentication failed");
       }
     } catch (error) {
+      setIsLoading(false);
+      toast.error("❌ Something went wrong. Please try again.");
       console.error("Authentication failed", error);
     }
   };
 
   const handleSocialAuth = (provider: string) => {
     setIsLoading(true);
-    // Simulate social auth
     setTimeout(() => {
       setIsLoading(false);
+      toast.success(`✅ Logged in with ${provider}`);
       onAuthSuccess();
     }, 1000);
   };
@@ -132,7 +138,7 @@ export const AuthPage: React.FC = () => {
           {/* Social Auth Buttons */}
           <div className="space-y-3 mb-6">
             <button
-              onClick={() => handleSocialAuth("google")}
+              onClick={() => handleSocialAuth("Google")}
               disabled={isLoading}
               className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -142,7 +148,7 @@ export const AuthPage: React.FC = () => {
               </span>
             </button>
             <button
-              onClick={() => handleSocialAuth("github")}
+              onClick={() => handleSocialAuth("GitHub")}
               disabled={isLoading}
               className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -168,29 +174,32 @@ export const AuthPage: React.FC = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    id="name"
-                    name="fullname"
-                    type="text"
-                    required={isSignUp}
-                    value={formData.fullname}
-                    onChange={handleInputChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="Enter your full name"
-                  />
-                </div>
+              <>
                 <div>
                   <label
                     htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Full Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <input
+                      id="name"
+                      name="fullname"
+                      type="text"
+                      required={isSignUp}
+                      value={formData.fullname}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="username"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
                     Username
@@ -205,11 +214,11 @@ export const AuthPage: React.FC = () => {
                       value={formData.username}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Enter your full name"
+                      placeholder="Enter your username"
                     />
                   </div>
                 </div>
-              </div>
+              </>
             )}
 
             <div>
@@ -348,7 +357,10 @@ export const AuthPage: React.FC = () => {
             <p className="text-gray-600">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
               <button
-                onClick={() => (setIsSignUp(!isSignUp), navigate(isSignUp ? "/auth/signin" : "/auth/signup"))}
+                onClick={() =>
+                  (setIsSignUp(!isSignUp),
+                  navigate(isSignUp ? "/auth/signin" : "/auth/signup"))
+                }
                 className="text-blue-600 hover:text-blue-500 font-medium"
               >
                 {isSignUp ? "Sign in" : "Sign up"}
@@ -364,6 +376,9 @@ export const AuthPage: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {/* Toast container */}
+      <ToastContainer position="top-right" autoClose={3000} theme="colored" />
     </div>
   );
 };

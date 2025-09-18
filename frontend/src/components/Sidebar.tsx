@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Search, Plus, Settings, MessageCircle } from "lucide-react";
 import { ConversationItem } from "./ConversationItem";
 import useSearchUserStore from "../store/searchUserStore";
 import useUserStore from "../store/userStore";
-import useChatStore, { type Chat} from "../store/chatStore";
+import { type Chat } from "../store/chatStore";
 import { useSocketStore } from "../store/socketStore";
 import { useNavigate } from "react-router-dom";
 import useMessageStore from "../store/messageStore";
@@ -24,21 +24,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggle,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { setModalOpen } = useSearchUserStore();
-  const navigate = useNavigate();
-  const user = useUserStore((state) => state.user);
-  const { sendMessage } = useSocketStore();
-  
-  console.log("Conversations in Sidebar:", conversations);
-  console.log("Active user ID:", user);
 
-  const filteredConversations = conversations.filter((conv) => {
-    const name =
-      (conv.isGroup && conv.groupName) ||
-      conv.participants.map((p) => p.fullname).join(", ") ||
-      "Unknown Chat";
-    return name.toLowerCase().includes(searchQuery.toLowerCase());
-  });
+  // ✅ Use selectors so Sidebar doesn’t re-render unnecessarily
+  const setModalOpen = useSearchUserStore((s) => s.setModalOpen);
+  const user = useUserStore((s) => s.user);
+  const sendMessage = useSocketStore((s) => s.sendMessage);
+  const navigate = useNavigate();
+
+  // ✅ Memoize filtering
+  const filteredConversations = useMemo(() => {
+    return conversations.filter((conv) => {
+      const name =
+        (conv.isGroup && conv.groupName) ||
+        conv.participants.map((p) => p.fullname).join(", ") ||
+        "Unknown Chat";
+      return name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+  }, [conversations, searchQuery]);
+
+  // ✅ Stable handler for selecting a conversation
+  const handleConversationClick = useCallback(
+    (conversation: Chat) => {
+      sendMessage("joinRoom", conversation.id as string);
+      onConversationSelect(conversation.id);
+
+      const msgStore = useMessageStore.getState();
+      msgStore.setMessages([]);
+      msgStore.fetchMessages(conversation.id as string);
+
+      navigate(`/chat/${conversation.id}`);
+    },
+    [sendMessage, onConversationSelect, navigate]
+  );
 
   return (
     <>
@@ -103,7 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Conversations */}
-        <div className="overflow-y-auto flex-1  ">
+        <div className="overflow-y-auto flex-1">
           {filteredConversations.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               {searchQuery ? "No conversations found" : "No conversations yet"}
@@ -114,14 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={conversation.id}
                 conversation={conversation}
                 isActive={activeConversationId === conversation.id}
-                onClick={() => {
-                  sendMessage("joinRoom", conversation.id as string);
-                  onConversationSelect(conversation.id);
-                  useMessageStore.getState().setMessages([]);
-                  useMessageStore.getState().fetchMessages(conversation.id as string);
-                  
-                  navigate(`/chat/${conversation.id}`); 
-                }}
+                onClick={() => handleConversationClick(conversation)}
               />
             ))
           )}

@@ -9,7 +9,7 @@ import {SocketIo} from './services/socketService.ts';
 import { publisher , subscriber } from './lib/redisClient.ts';
 import messageRouter from './routes/message.route.ts';
 import callRouter from './routes/call.route.ts';
-
+import userRouter from './routes/user.route.ts';
 import { v4 as uuidv4 } from "uuid";
 const app = express();
 app.use(express.json());
@@ -38,10 +38,11 @@ const io = new Server(server, {
 
 
 
-app.use('/api/auth', authRoute);
-app.use("/api/u",chatrouter)
-app.use("/api/u",messageRouter)
-app.use("/api/calls", callRouter);
+app.use('/api/v1/auth', authRoute);
+app.use("/api/v1/chats",chatrouter)
+app.use("/api/v1/messages",messageRouter)
+app.use("/api/v1/calls", callRouter);
+app.use("/api/v1/user", userRouter);
 async function startServer() {
   try {
     const PORT = process.env.PORT || 3000;

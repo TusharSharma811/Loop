@@ -39,7 +39,7 @@ const useChatStore = create<ChatStore>((set) => ({
  fetchChats: async () => {
   set({ loading: true, error: null });
   try {
-    const response = await api.get("/u/user/chats");
+    const response = await api.get("/chats");
     if (!response.data) throw new Error("Failed to fetch chats");
 
     const data: Chat[] = response.data;
@@ -60,7 +60,7 @@ const useChatStore = create<ChatStore>((set) => ({
   createChat: async (participantIds: string[], isGroup: boolean, groupName?: string) => {
   set({ loading: true, error: null });
   try {
-    const response = await api.post("/u/create/chat", {
+    const response = await api.post("/chats/create/chat", {
       participantIds,
       isGroup,
       groupName,

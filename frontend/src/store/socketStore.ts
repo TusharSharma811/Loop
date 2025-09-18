@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import useMessageStore, { type Message } from "./messageStore";
-
+import useUserStore from "./userStore";
 type SocketStore = {
   socket: Socket | null;
   connect: () => void;
@@ -28,10 +28,12 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       console.log("❌ Disconnected");
     });
 
-    // Example listener
     socket.on("chat-message", (msg) => {
       console.log("📩 New message:", msg);
+      const user = useUserStore.getState().user;
+      if (msg.message.senderId === user?.id) return;
       const messageStore = useMessageStore.getState();
+      
       messageStore.addMessage(msg.message as Message);
       console.log("Updated messages:", messageStore.messages);
     });

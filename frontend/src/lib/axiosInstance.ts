@@ -2,7 +2,7 @@ import axios, { AxiosError, type AxiosRequestConfig  } from "axios";
 import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
-  baseURL: "/api", 
+  baseURL: "/api/v1", 
   withCredentials: true, 
 });
 

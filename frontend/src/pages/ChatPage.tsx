@@ -10,11 +10,25 @@ import useUserStore from "../store/userStore";
 import { useSocketStore } from "../store/socketStore";
 import ChatAppSkeleton from "../components/skeletons/ChatLoading";
 import { motion } from "motion/react";
+import { StreamVideo } from "@stream-io/video-react-sdk";
+import { CallManager } from "../components/CallComponents/CallManager";
+import { useCallStreamStore } from "../store/callStreamStore";
+
+const CallManagerWrapper = () => {
+  const navigate = useNavigate();
+
+  const handleNavigateToCall = (callId: string) => {
+    navigate(`/call/${callId}`);
+  };
+
+  return <CallManager onNavigateToCall={handleNavigateToCall} />;
+};
 
 export const ChatPage: React.FC = () => {
   const { fetchChats, chats, loading: chatLoading } = useChatStore();
   const { modalOpen } = useSearchUserStore();
   const { loading, user } = useUserStore();
+   const { fetchClient, client } = useCallStreamStore();
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
   >(null);
@@ -24,8 +38,13 @@ export const ChatPage: React.FC = () => {
   const { chat } = useParams<{ chat: string }>();
 
   useEffect(() => {
-    fetchChats();
-  }, [fetchChats]);
+    async function initialize() {
+      if (!user) return;
+      await fetchChats();
+      await fetchClient();
+    }
+    initialize();
+  }, [fetchChats , user, fetchClient]);
 
   useEffect(() => {
     if (chat) {
@@ -35,7 +54,6 @@ export const ChatPage: React.FC = () => {
     }
   }, [chat, activeConversationId, location.pathname, navigate]);
 
-  // 🔹 Join socket room only if we have a valid conversation
   useEffect(() => {
     if (activeConversationId) {
       useSocketStore.getState().sendMessage("joinRoom", activeConversationId);
@@ -56,9 +74,10 @@ export const ChatPage: React.FC = () => {
 
   return (
     <>
-      {loading || chatLoading ? (
+      {!client || loading || chatLoading ? (
         <ChatAppSkeleton />
       ) : (
+            <StreamVideo client={client}>
         <motion.div
           initial={{ opacity: 0.5 }}
           animate={{ opacity: 1 }}
@@ -101,6 +120,8 @@ export const ChatPage: React.FC = () => {
             />
           </div>
         </motion.div>
+        <CallManagerWrapper />
+        </StreamVideo>
       )}
     </>
   );

@@ -1,7 +1,7 @@
 
 import { create } from "zustand";
 import api from "../lib/axiosInstance";
-
+import { Socket } from "socket.io-client";
 export interface Message {
   id?: string;
   chatId: string;
@@ -15,29 +15,31 @@ export interface Message {
 export interface MessageStore {
   loading: boolean;
   messages: Message[];
+  cursor?: number | string | null;
   setMessages: (messages: Message[]) => void;
   addMessage: (message: Message) => void;
   clearMessages: () => void;
-  fetchMessages: (conversationId: string) => Promise<void>;
-  sendMessage: (io: any, conversationId: string, content: string, messageType: string, senderId: string) => Promise<void>;
+  fetchMessages: (conversationId: string ) => Promise<void>;
+  sendMessage: (io: Socket, conversationId: string, content: string, messageType: string, senderId: string) => Promise<void>;
 }
-  const useMessageStore = create<MessageStore>((set) => ({
+  const useMessageStore = create<MessageStore>((set,get) => ({
   loading: true,
   messages: [] as Message[],
+  cursor: null,
   setMessages: (messages) => set({ messages }),
   addMessage: (message) =>
-    set((state) => ({ messages: [...state.messages, message] })),
+  set((state) => ({ messages: [...state.messages, message] })),
   clearMessages: () => set({ messages: [] }),
-  fetchMessages: async (conversationId) => {
+  fetchMessages: async (conversationId ) => {
     try {
-      const response = await api.get(`/u/get-messages/${conversationId}`);
+      const response = await api.get(`/messages/get-messages/${conversationId}?${get().cursor ? `cursor=${get().cursor}` : ''}`);
       if(!response) {
         throw new Error("Failed to fetch messages");
       }
       console.log("Fetched messages:", response.data);
-      await new Promise(resolve => setTimeout(resolve, 700)); // Simulate loading delay
+      await new Promise(resolve => setTimeout(resolve, 500)); 
       const data: Message[] = response.data.messages;
-      set({ messages: data, loading: false });
+      set({ messages: data, loading: false , cursor: response.data.nextCursor });
     } catch (error) {
       console.error("Error fetching messages:", error);
     }finally {
@@ -52,7 +54,7 @@ export interface MessageStore {
         content,
         messageType,
         timestamp: new Date(),
-        statuses: [], // or provide appropriate statuses if needed
+        statuses: [], 
       };
       set((state) => ({ messages: [...state.messages, message] }));
       await io.emit("NewMessage", message);

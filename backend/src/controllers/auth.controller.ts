@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { generateJWT, generateRefreshJWT } from "../utils/generateJWT.ts";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config();
 
@@ -124,13 +125,79 @@ class AuthController {
 
   // 🟢 GOOGLE LOGIN (placeholder)
   googleLogin = (req: Request, res: Response) => {
-    // TODO: Implement Google OAuth login
-    return res.status(501).json({ message: "Not implemented" });
+    const googleOauthUrl = process.env.GOOGLE_OAUTH_URL ;
+    const redirectUl = "http://localhost:3000/api/v1/auth/google-login/callback" ;
+    const client_id = process.env.GOOGLE_OAUTH_CLIENT_ID ;
+    const state = "someRandomState" ;
+    const scopes = [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/calendar",
+      "https://www.googleapis.com/auth/calendar.events"
+    ].join(" ");
+    const authUrl = `${googleOauthUrl}?response_type=code&client_id=${client_id}&redirect_uri=${redirectUl}&scope=${scopes}&state=${state}&access_type=offline&prompt=consent`;
+    return res.redirect(authUrl);
   }
 
-  googleLoginCallback = (req: Request, res: Response) => {
-    // TODO: Handle Google OAuth callback
-    return res.status(501).json({ message: "Not implemented" });
+  googleLoginCallback = async (req: Request, res: Response) => {
+    try {
+      const redirectUl = "http://localhost:3000/api/v1/auth/google-login/callback";
+      const client_id = process.env.GOOGLE_OAUTH_CLIENT_ID;
+      const client_secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+      const state = "someRandomState";
+
+    const { code, state: returnedState } = req.query;
+    if (state !== returnedState) {
+      return res.status(400).json({ message: "Invalid state parameter" });
+    }
+    const tokenRes = await axios.post("https://oauth2.googleapis.com/token", 
+      {
+        code,
+        client_id: client_id,
+        client_secret: client_secret,
+        redirect_uri: redirectUl,
+        grant_type: "authorization_code",
+      },
+    );
+    const { access_token, refresh_token } = tokenRes.data;
+    const profileRes = await axios.get("https://www.googleapis.com/oauth2/v1/userinfo", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    const { email, name, id: googleId, picture } = profileRes.data;
+
+    let user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email,
+          fullname: name,
+          username: email.split("@")[0],
+          passwordHash: bcrypt.hashSync(googleId, 10),
+          refreshToken: refresh_token,
+          avatarUrl: picture,
+        },
+      });
+    }
+    const authToken = generateJWT(user.id);
+    const refreshToken = generateRefreshJWT(user.id);
+    this.setAuthCookies(res, authToken, refreshToken);
+    return res.status(200).send(
+      `
+      <script>
+        window.opener.postMessage({ 
+          type: 'google-auth-success',
+    }, '*');
+        window.close();
+      </script>
+      <p>Authentication successful. You can close this window.</p>
+      `
+    )
+
+    } catch (error) {
+      console.error("Error during Google login callback", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+     
   }
 
   // 🟢 VERIFY

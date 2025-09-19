@@ -12,6 +12,7 @@
   "dependencies": {
     "@stream-io/video-react-sdk": "^1.21.1",
     "@tailwindcss/vite": "^4.1.13",
+    "@types/node": "^24.5.2",
     "axios": "^1.11.0",
     "lucide-react": "^0.544.0",
     "motion": "^12.23.12",

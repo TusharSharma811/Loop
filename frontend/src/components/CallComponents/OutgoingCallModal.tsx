@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Call, StreamCall, useCall } from "@stream-io/video-react-sdk";
 import { PhoneOff, X } from "lucide-react";
-import defaultAvatar from "../../assets/defaultAvatar.png";
+import defaultAvatar from "../../assets/default-avatar.png";
 type OutgoingCallModalProps = {
   call: Call;
 };

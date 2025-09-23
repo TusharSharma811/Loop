@@ -7,7 +7,6 @@ import {
   Mail,
   Lock,
   User,
-  Github,
   Chrome,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -113,7 +112,7 @@ export const AuthPage: React.FC = () => {
     if (event.origin !== "http://localhost:3000") return; // security check
     if (event.data.type === "google-auth-success") {
       console.log("User logged in!");
-      popup.close();
+      popup?.close();
     }
        setIsAuthenticated(true);
         fetchUser();

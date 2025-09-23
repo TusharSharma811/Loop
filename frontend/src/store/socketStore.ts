@@ -3,6 +3,8 @@ import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
 import useMessageStore, { type Message } from "./messageStore";
 import useUserStore from "./userStore";
+import useChatStore from "./chatStore";
+
 type SocketStore = {
   socket: Socket | null;
   connect: () => void;
@@ -18,6 +20,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
 
     const socket = io("http://localhost:3000", {
       transports: ["websocket"],
+      query: { userId: useUserStore.getState().user?.id  || "" },
     });
 
     socket.on("connect", () => {
@@ -36,6 +39,11 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
       
       messageStore.addMessage(msg.message as Message);
       console.log("Updated messages:", messageStore.messages);
+    });
+
+    socket.on("online-user", (user) => {
+      console.log("👤 Online user:", user);
+      useChatStore.getState().addOnlineUser(user);
     });
 
     set({ socket });

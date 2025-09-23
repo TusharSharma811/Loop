@@ -22,7 +22,9 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() && !disabled) {
-      sendMessage(socket, conversationId, message.trim(), 'text', currentUser?.id);
+      if(socket && conversationId && currentUser) {
+        sendMessage(socket, conversationId, message.trim(), 'text', currentUser?.id);
+      }
       setMessage('');
     }
   };

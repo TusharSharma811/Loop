@@ -7,7 +7,7 @@ export interface Message {
   chatId: string;
   senderId: string;
   content: string;
-  timestamp: Date;
+  timeStamp: Date;
   messageType: string;
   statuses: string[];
 }
@@ -53,7 +53,7 @@ export interface MessageStore {
         senderId: senderId,
         content,
         messageType,
-        timestamp: new Date(),
+        timeStamp: new Date(),
         statuses: [], 
       };
       set((state) => ({ messages: [...state.messages, message] }));

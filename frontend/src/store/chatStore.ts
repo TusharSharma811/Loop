@@ -13,14 +13,17 @@ export interface Chat {
   participants: User[];
   isGroup: boolean;
   groupName?: string;
+  avatarUrl?: string;
 }
 
 
 type ChatStore = {
   chats: Chat[];
+  onlineUsers: string[];
   loading: boolean;
   error: string | null;
   setChats: (chats: Chat[]) => void;
+  addOnlineUser: (userId: string) => void;
   addChat: (chat: Chat) => void;
   clearChats: () => void;
   fetchChats: () => Promise<void>;
@@ -29,10 +32,17 @@ type ChatStore = {
 
 const useChatStore = create<ChatStore>((set) => ({
   chats: [],
+  onlineUsers: [],
   loading: true,
   error: null,
 
   setChats: (chats) => set({ chats }),
+  addOnlineUser: (userId) =>
+    set((state) => ({
+      onlineUsers: state.onlineUsers.includes(userId)
+        ? state.onlineUsers
+        : [...state.onlineUsers, userId],
+    })),
   addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
   clearChats: () => set({ chats: [] }),
 

@@ -1,40 +1,23 @@
 // src/components/CallComponents/OutgoingCallModal.tsx
 import React, { useEffect, useState } from "react";
-import { StreamCall, useCall } from "@stream-io/video-react-sdk";
+import { Call, StreamCall, useCall } from "@stream-io/video-react-sdk";
 import { PhoneOff, X } from "lucide-react";
-import defaultAvatar from "../../assets/default-avatar.png";
-
+import defaultAvatar from "../../assets/defaultAvatar.png";
 type OutgoingCallModalProps = {
-  call: any;
+  call: Call;
 };
 
 const InnerModal: React.FC = () => {
   const call = useCall();
   const [seconds, setSeconds] = useState(0);
   const [isCanceling, setIsCanceling] = useState(false);
-  const onCancel = (call: any) => {
+  const onCancel = (call: Call) => {
     console.log("Call cancelled: ", call);
   };
   useEffect(() => {
     const t = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(t);
   }, []);
-
-  const derivedName =
-    call?.data?.members?.[0]?.name ||
-    call?.data?.members?.[0]?.user_id ||
-    call?.data?.created_by?.name ||
-    "Unknown user";
-
-  const derivedAvatar =
-    call?.data?.members?.[0]?.image ||
-    call?.data?.created_by?.image ||
-    defaultAvatar;
-
-  const derivedIsVideo =
-    typeof call?.data?.is_video === "boolean"
-      ? call.data.is_video
-      : !!call?.data?.isVideo || !!call?.data?.is_video;
 
   const formatTime = (t: number) => {
     const m = Math.floor(t / 60)
@@ -80,7 +63,7 @@ const InnerModal: React.FC = () => {
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
             <img
-              src={derivedAvatar}
+              src={defaultAvatar}
               alt="callee avatar"
               className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg"
             />
@@ -89,9 +72,9 @@ const InnerModal: React.FC = () => {
           </div>
 
           <div className="text-center">
-            <h3 className="text-2xl font-semibold text-gray-900">{derivedName}</h3>
+            <h3 className="text-2xl font-semibold text-gray-900">{"xyz"}</h3>
             <p className="text-sm text-gray-500 mt-1">
-              {derivedIsVideo ? "Starting video call…" : "Calling…"}
+              { "Calling…"}
             </p>
             <div className="mt-2 text-xs text-gray-400">
               Ringing • <span className="font-medium text-gray-700">{formatTime(seconds)}</span>
@@ -112,7 +95,7 @@ const InnerModal: React.FC = () => {
           </div>
 
           <div className="mt-3 text-xs text-center text-gray-400">
-            Waiting for {derivedName} to answer…
+            Waiting for {"abc"} to answer…
           </div>
         </div>
       </div>

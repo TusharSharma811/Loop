@@ -97,6 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Plus className="h-5 w-5" />
             </button>
             <button
+              onClick={() => navigate("/settings")}
               aria-label="Settings"
               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >

@@ -24,7 +24,7 @@ export const CallManager = ({
   useEffect(() => {
     if (!client) return;
 
-    const handleAccepted = (event: any) => {
+    const handleAccepted = (event) => {
       const callId = event.call.id;
       onNavigateToCall(callId);
     };

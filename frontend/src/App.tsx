@@ -13,6 +13,7 @@ import useUserStore from './store/userStore';
 import { useSocketStore } from './store/socketStore';
 
 import ChatAppSkeleton from './components/skeletons/ChatLoading';
+import Settings from './pages/Settings';
 
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
  
   const [isLoading, setIsLoading] = useState(true);
  
-  // --- Initialize user, socket, and video client ---
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -59,6 +60,7 @@ function App() {
           {/* Protected routes */}
           <Route path="chat/:chatId?" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
           <Route path="call/:callId" element={<ProtectedRoute><CallPage /></ProtectedRoute>} />
+          <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<div>404 Not Found</div>} />

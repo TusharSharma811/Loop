@@ -1,5 +1,5 @@
 
-export function ChatListItemSkeleton({ className }: { className?: string }) {
+export function ChatListItemSkeleton() {
   return (
     <div className={"flex items-center space-x-3 p-3 rounded-lg"}>
       <div className="w-10 h-10 bg-muted animate-pulse rounded-full flex-shrink-0" />
@@ -23,7 +23,7 @@ export function ChatListSkeleton({ count = 8 }: { count?: number }) {
 }
 
 
-export function UserMessageSkeleton({ className }: { className?: string }) {
+export function UserMessageSkeleton() {
   return (
     <div className={"flex justify-end mb-4"}>
       <div className="flex items-start space-x-2 max-w-[80%]">
@@ -37,7 +37,7 @@ export function UserMessageSkeleton({ className }: { className?: string }) {
   )
 }
 
-export function AssistantMessageSkeleton({ className }: { className?: string }) {
+export function AssistantMessageSkeleton() {
   return (
     <div className={"flex justify-start mb-4"}>
       <div className="flex items-start space-x-2 max-w-[80%]">

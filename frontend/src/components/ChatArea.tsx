@@ -3,7 +3,6 @@ import { MessageBubble } from './MessageCard';
 import { MessageInput } from './MessageInput';
 import type { User } from '../store/userStore';
 import type { Chat as Conversation } from '../store/chatStore';
-import type { Message } from '../store/messageStore';
 import useMessageStore from '../store/messageStore';
 import useUserStore from '../store/userStore';
 import { MessageListSkeleton } from './skeletons/ChatAreaSkeleton';

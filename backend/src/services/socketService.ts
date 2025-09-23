@@ -23,9 +23,32 @@ export class SocketIo {
 
   
   async init() {
-    this.io.on("connection", (socket: Socket) => {
+    this.io.on("connection", async (socket: Socket) => {
       console.log("New client connected:", socket.id);
       this.registerEventHandlers(socket);
+      const userId : string= socket.handshake.query.userId as string;
+      if (userId) {
+        console.log("User ID from query:", userId);
+      }
+      const chats = await prisma.chat.findMany({
+        where: {
+          participants: {
+            some: {
+              userId: userId
+            },
+          },
+         
+        },
+         select: { id: true },
+      });
+      console.log("User's chats:", chats);
+      
+      chats.forEach((chatId)=>{
+        socket.join(chatId.id);
+        console.log("User", userId, "joined room:", chatId.id);
+        
+        socket.to(chatId.id).emit("online-user" , userId)
+      })
     });
 
     await this.setupRedisSubscriptions();

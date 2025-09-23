@@ -39,18 +39,14 @@ console.log("Rendering MyCallUi, call:", call, "participants:", participants);
 
       {/* Participants Grid */}
       <main className="flex-1 flex items-center justify-center p-4">
-        <PaginatedGridLayout>
+        <PaginatedGridLayout />
           {participants.map((p) => (
             <ParticipantView
               key={p.sessionId}
               participant={p}
               trackType="videoTrack"
-              ParticipantViewUI={({ videoElement }) =>
-                videoElement ? (
-                  <div className="relative w-full h-full bg-black rounded-xl overflow-hidden shadow-lg">
-                    {videoElement}
-                  </div>
-                ) : (
+              ParticipantViewUI={() =>
+                  (
                   <div className="flex items-center justify-center w-full h-full bg-gray-800 rounded-xl">
                     <Avatar
                       imageSrc={p.image}
@@ -63,7 +59,7 @@ console.log("Rendering MyCallUi, call:", call, "participants:", participants);
               className="rounded-xl overflow-hidden shadow-lg"
             />
           ))}
-        </PaginatedGridLayout>
+    
       </main>
 
       {/* Footer Controls */}

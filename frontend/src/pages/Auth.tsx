@@ -7,7 +7,6 @@ import {
   Mail,
   Lock,
   User,
-  Github,
   Chrome,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -81,7 +80,7 @@ export const AuthPage: React.FC = () => {
       setIsLoading(false);
 
       if (response.ok) {
-        localStorage.setItem("isAuthenticated", "true");
+        
         setIsAuthenticated(true);
         fetchUser();
         onAuthSuccess();
@@ -95,13 +94,38 @@ export const AuthPage: React.FC = () => {
     }
   };
 
-  const handleSocialAuth = (provider: string) => {
-    setIsLoading(true);
-    setTimeout(() => {
+  const handleSocialAuth = () => {
+    try {
+      setIsLoading(true);
+       const width = 500;
+  const height = 600;
+  const left = window.screenX + (window.outerWidth - width) / 2;
+  const top = window.screenY + (window.outerHeight - height) / 2;
+
+
+  const popup = window.open(
+    "http://localhost:3000/api/v1/auth/google-login",
+    "Google OAuth",
+    `width=${width},height=${height},left=${left},top=${top}`
+  );
+  window.addEventListener("message", (event) => {
+    if (event.origin !== "http://localhost:3000") return; // security check
+    if (event.data.type === "google-auth-success") {
+      console.log("User logged in!");
+      popup?.close();
+    }
+       setIsAuthenticated(true);
+        fetchUser();
+        onAuthSuccess();
+  });
+    } catch (error) {
       setIsLoading(false);
-      toast.success(`✅ Logged in with ${provider}`);
-      onAuthSuccess();
-    }, 1000);
+      console.error("Error during social auth", error);
+      toast.error("❌ Social authentication failed. Please try again.");
+
+    }
+   
+    
   };
 
   return (
@@ -138,23 +162,13 @@ export const AuthPage: React.FC = () => {
           {/* Social Auth Buttons */}
           <div className="space-y-3 mb-6">
             <button
-              onClick={() => handleSocialAuth("Google")}
+              onClick={() => handleSocialAuth()}
               disabled={isLoading}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <Chrome className="h-5 w-5 mr-3 text-gray-500" />
               <span className="text-gray-700 font-medium">
                 Continue with Google
-              </span>
-            </button>
-            <button
-              onClick={() => handleSocialAuth("GitHub")}
-              disabled={isLoading}
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Github className="h-5 w-5 mr-3 text-gray-500" />
-              <span className="text-gray-700 font-medium">
-                Continue with GitHub
               </span>
             </button>
           </div>

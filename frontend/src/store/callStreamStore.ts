@@ -105,7 +105,6 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
   initiateCall: async (
     calleeId: string,
     isVideo = false,
-    calleeName?: string
   ) => {
     const { client } = get();
     if (!client) throw new Error("No Stream client available");

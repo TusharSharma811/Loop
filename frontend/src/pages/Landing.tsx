@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageCircle, Users, Shield, Zap, Star, ArrowRight, Check } from 'lucide-react';
+import { MessageCircle, Users, Shield, Zap, Star, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -48,49 +48,7 @@ const features = [
     }
   ];
 
-  const pricingPlans = [
-    {
-      name: "Free",
-      price: "$0",
-      period: "forever",
-      features: [
-        "Up to 10 conversations",
-        "Basic messaging features",
-        "Mobile & desktop apps",
-        "Community support"
-      ],
-      popular: false
-    },
-    {
-      name: "Pro",
-      price: "$9",
-      period: "per month",
-      features: [
-        "Unlimited conversations",
-        "Advanced group features",
-        "File sharing & voice messages",
-        "Priority support",
-        "Custom themes",
-        "Message history backup"
-      ],
-      popular: true
-    },
-    {
-      name: "Team",
-      price: "$19",
-      period: "per month",
-      features: [
-        "Everything in Pro",
-        "Team management tools",
-        "Advanced security features",
-        "Analytics & insights",
-        "API access",
-        "24/7 dedicated support"
-      ],
-      popular: false
-    }
-  ];
-
+ 
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();

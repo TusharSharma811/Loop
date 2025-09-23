@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Call,
   StreamCall,
   useCall,
   useCallStateHooks,
@@ -9,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import useUserStore from "../../store/userStore";
 
 type IncomingCallModalProps = {
-  call: any;
+  call: Call;
 };
 
 const InnerModal: React.FC = () => {

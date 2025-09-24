@@ -184,12 +184,12 @@ class ChatController {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const chatId = req.params.id;
+      const chatId : any= req.params.id;
       if (!chatId) {
         return res.status(400).json({ error: "Invalid chat ID" });
       }
 
-      const chat = await prisma.chat.findFirst({
+      const chat : any = await prisma.chat.findFirst({
         where: {
           id: chatId,
           participants: {

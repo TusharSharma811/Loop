@@ -8,6 +8,7 @@ import { useSocketStore } from "../store/socketStore";
 import { useNavigate } from "react-router-dom";
 import useMessageStore from "../store/messageStore";
 
+
 interface SidebarProps {
   conversations: Chat[];
   activeConversationId: string | null;
@@ -33,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // ✅ Memoize filtering
   const filteredConversations = useMemo(() => {
+    console.log("Filtering conversations" , conversations);
     return conversations.filter((conv) => {
       const name =
         (conv.isGroup && conv.groupName) ||

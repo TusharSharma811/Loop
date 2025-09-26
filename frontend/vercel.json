@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "$API_BASE_URL/:path*"
+      "destination": "$VITE_API_BASE_URL/:path*"
     },
     { 
       "source": "/(.*)", 

@@ -128,14 +128,13 @@ class AuthController {
   // 🟢 GOOGLE LOGIN (placeholder)
   googleLogin = (req: Request, res: Response) => {
     const googleOauthUrl = process.env.GOOGLE_OAUTH_URL ;
-    const redirectUl = "http://localhost:3000/api/v1/auth/google-login/callback" ;
+    const redirectUl = process.env.GOOGLE_OAUTH_REDIRECT_URL || "http://localhost:3000/api/v1/auth/google-login/callback" ;
     const client_id = process.env.GOOGLE_OAUTH_CLIENT_ID ;
     const state = "someRandomState" ;
     const scopes = [
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/userinfo.profile",
-      "https://www.googleapis.com/auth/calendar",
-      "https://www.googleapis.com/auth/calendar.events"
+      
     ].join(" ");
     const authUrl = `${googleOauthUrl}?response_type=code&client_id=${client_id}&redirect_uri=${redirectUl}&scope=${scopes}&state=${state}&access_type=offline&prompt=consent`;
     return res.redirect(authUrl);
@@ -143,7 +142,7 @@ class AuthController {
 
   googleLoginCallback = async (req: Request, res: Response) => {
     try {
-      const redirectUl = "http://localhost:3000/api/v1/auth/google-login/callback";
+      const redirectUl = process.env.GOOGLE_OAUTH_REDIRECT_URL || "http://localhost:3000/api/v1/auth/google-login/callback";
       const client_id = process.env.GOOGLE_OAUTH_CLIENT_ID;
       const client_secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
       const state = "someRandomState";

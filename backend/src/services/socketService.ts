@@ -2,7 +2,7 @@
 import { publisher, subscriber } from "../lib/redisClient.js";
 import { Server, Socket } from "socket.io";
 import prisma from "../lib/prismaClient.js";
-
+import cloudinaryClient from "../lib/cloudinaryClient.js";
 interface MessagePayload {
   id?: string;
   chatId: string;
@@ -74,14 +74,32 @@ export class SocketIo {
   }
 
   
-  private async handleNewMessage(socket: Socket, message: MessagePayload) {
+  private async handleNewMessage(socket: Socket, message: MessagePayload , type?: string) {
     if (!message.content || !message.chatId || !message.senderId) {
       console.error("Invalid message data:", message);
       return;
     }
-
+    let newMessage;
     try {
-      const newMessage = await prisma.message.create({
+      if(type === "image"){
+        const fileData = JSON.parse(message.content); 
+         const uploadResult = await cloudinaryClient.uploader.upload(fileData.content, {
+          folder: "chat_images", 
+          resource_type: "auto"
+        });
+        const contentToStore = uploadResult.secure_url;
+         newMessage = await prisma.message.create({
+        data: {
+          chatId: message.chatId,
+          senderId: message.senderId,
+          content: contentToStore,
+          messageType: message.messageType,
+          timeStamp: new Date(),
+        },
+      });
+      }
+      else{
+        newMessage = await prisma.message.create({
         data: {
           chatId: message.chatId,
           senderId: message.senderId,
@@ -90,6 +108,8 @@ export class SocketIo {
           messageType: message.messageType,
         },
       });
+      }
+      
 
       console.log("Message saved:", newMessage);
 

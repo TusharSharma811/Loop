@@ -62,7 +62,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     if (socket) {
       console.log("📤 Emitting event:", event, data);
 
-      socket.emit(event, data);
+      socket.emit(event, data );
     } else {
       console.warn("⚠️ Socket not connected");
     }

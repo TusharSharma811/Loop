@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { Search, Plus, Settings, MessageCircle } from "lucide-react";
+import { Search, Plus, MessageCircle } from "lucide-react";
 import { ConversationItem } from "./ConversationItem";
 import useSearchUserStore from "../store/searchUserStore";
 import useUserStore from "../store/userStore";
@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       const name =
         (conv.isGroup && conv.groupName) ||
         conv.participants.map((p) => p.fullname).join(", ") ||
-        "Unknown Chat";
+        "Unknown";
       return name.toLowerCase().includes(searchQuery.toLowerCase());
     });
   }, [conversations, searchQuery]);
@@ -102,13 +102,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <Plus className="h-5 w-5" />
             </button>
-            <button
+            {/* <button
               onClick={() => navigate("/settings")}
               aria-label="Settings"
               className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
             >
               <Settings className="h-5 w-5" />
-            </button>
+            </button> */}
           </div>
         </div>
 

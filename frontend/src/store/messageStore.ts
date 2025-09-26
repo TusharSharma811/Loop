@@ -56,7 +56,7 @@ export interface MessageStore {
         statuses: [], 
       };
       set((state) => ({ messages: [...state.messages, message] }));
-      await io.emit("NewMessage", message);
+      io.emit("NewMessage", message , messageType);
     } catch (error) {
       console.error("Error sending message:", error);
     }

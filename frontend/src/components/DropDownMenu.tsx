@@ -3,7 +3,7 @@ import { MoreVertical, Trash2 } from 'lucide-react'; // Assuming you use lucide-
 
 const DropdownMenu = ({ onDelete }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   
   const toggleDropdown = () => {

@@ -1,6 +1,6 @@
 import { StreamClient } from "@stream-io/node-sdk";
 import { Request, Response } from "express";
-import { RequestWithUser } from "../middlewares/protectRoutes";
+import { RequestWithUser } from "../middlewares/protectRoutes.ts";
 import dotenv from "dotenv";
 dotenv.config();
 export const getToken = async (req: RequestWithUser, res: Response) => {

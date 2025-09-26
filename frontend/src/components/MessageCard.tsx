@@ -16,10 +16,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   isOwn,
   showAvatar
 }) => {
-  const formatTime = (date: Date) => {
-    if (!isOwn) return null;
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  // const formatTime = (date: Date) => {
+  //   if (!isOwn) return null;
+  //   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // };
   const user = useUserStore((state) => state.user);
 
   // const getStatusIcon = () => {

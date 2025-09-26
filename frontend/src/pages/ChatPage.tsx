@@ -1,7 +1,7 @@
 import { Sidebar } from "../components/Sidebar";
 import { ChatHeader } from "../components/ChatHeader";
 import { ChatArea } from "../components/ChatArea";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useChatStore from "../store/chatStore";
 import useSearchUserStore from "../store/searchUserStore";
@@ -9,51 +9,63 @@ import { UserSearchModal } from "../components/UserSearchModal";
 import useUserStore from "../store/userStore";
 import { useSocketStore } from "../store/socketStore";
 import ChatAppSkeleton from "../components/skeletons/ChatLoading";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 import { motion } from "motion/react";
+import { StreamVideo } from "@stream-io/video-react-sdk";
+import { CallManager } from "../components/CallComponents/CallManager";
+import { useCallStreamStore } from "../store/callStreamStore";
+
+const CallManagerWrapper = () => {
+  const navigate = useNavigate();
+
+  const handleNavigateToCall = (callId: string) => {
+    navigate(`/call/${callId}`);
+  };
+
+  return <CallManager onNavigateToCall={handleNavigateToCall} />;
+};
+
 export const ChatPage: React.FC = () => {
-  const { fetchChats, chats } = useChatStore();
+  const { fetchChats, chats, loading: chatLoading } = useChatStore();
   const { modalOpen } = useSearchUserStore();
   const { loading, user } = useUserStore();
+   const { fetchClient, client } = useCallStreamStore();
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
   >(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const activeConversation =
-    chats && chats.length > 0
-      ? chats.find((c) => c.id === activeConversationId) || null
-      : null;
-  useEffect(() => {
-    if (!activeConversationId && location.pathname !== "/chat") {
-      navigate("/chat");
-    }
-  }, [activeConversationId, navigate, location.pathname]);
+  const { chat } = useParams<{ chat: string }>();
 
   useEffect(() => {
-    fetchChats();
-  }, [fetchChats , chats]);
-  useEffect(() => {
-    useSocketStore.getState().sendMessage("joinRoom", activeConversationId);
-  }, [activeConversationId]);
-  const { chat } = useParams<{ chat: string }>();
+    async function initialize() {
+      if (!user) return;
+      await fetchChats();
+      await fetchClient();
+    }
+    initialize();
+  }, [fetchChats , user, fetchClient]);
+
   useEffect(() => {
     if (chat) {
-      console.log("Setting active conversation ID from URL:", chat);
       setActiveConversationId(chat);
+    } else if (!activeConversationId && location.pathname !== "/chat") {
+      navigate("/chat");
     }
-  }, [chat]);
+  }, [chat, activeConversationId, location.pathname, navigate]);
 
   useEffect(() => {
-    if (chats && chats.length === 0) {
-      fetchChats();
+    if (activeConversationId) {
+      useSocketStore.getState().sendMessage("joinRoom", activeConversationId);
     }
-  }, [chats, fetchChats]);
+  }, [activeConversationId]);
+
+  const activeConversation =
+    chats?.find((c) => c.id === activeConversationId) || null;
 
   const handleConversationSelect = (conversationId: string) => {
     setActiveConversationId(conversationId);
+    navigate(`/chat/${conversationId}`);
   };
 
   const toggleSidebar = () => {
@@ -62,10 +74,16 @@ export const ChatPage: React.FC = () => {
 
   return (
     <>
-      {loading ? (
+      {!client || loading || chatLoading ? (
         <ChatAppSkeleton />
       ) : (
-        <motion.div initial={{ opacity: 0.5 }} animate={{ opacity: 1 }} className="flex overflow-hidden relative h-screen bg-gray-100">
+            <StreamVideo client={client}>
+        <motion.div
+          initial={{ opacity: 0.5 }}
+          animate={{ opacity: 1 }}
+          className="flex overflow-hidden relative h-screen bg-gray-100"
+        >
+          {/* Sidebar */}
           <div className="flex h-screen">
             <Sidebar
               conversations={chats || []}
@@ -75,6 +93,8 @@ export const ChatPage: React.FC = () => {
               onToggle={toggleSidebar}
             />
           </div>
+
+          {/* Search Modal */}
           {modalOpen && (
             <UserSearchModal
               isOpen={modalOpen}
@@ -83,6 +103,7 @@ export const ChatPage: React.FC = () => {
             />
           )}
 
+          {/* Main Chat Area */}
           <div className="flex-1 flex flex-col min-w-0">
             <ChatHeader
               conversation={activeConversation}
@@ -99,6 +120,8 @@ export const ChatPage: React.FC = () => {
             />
           </div>
         </motion.div>
+        <CallManagerWrapper />
+        </StreamVideo>
       )}
     </>
   );

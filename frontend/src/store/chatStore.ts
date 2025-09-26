@@ -13,14 +13,17 @@ export interface Chat {
   participants: User[];
   isGroup: boolean;
   groupName?: string;
+  avatarUrl?: string;
 }
 
 
 type ChatStore = {
   chats: Chat[];
+  onlineUsers: string[];
   loading: boolean;
   error: string | null;
   setChats: (chats: Chat[]) => void;
+  addOnlineUser: (userId: string) => void;
   addChat: (chat: Chat) => void;
   clearChats: () => void;
   fetchChats: () => Promise<void>;
@@ -29,50 +32,73 @@ type ChatStore = {
 
 const useChatStore = create<ChatStore>((set) => ({
   chats: [],
+  onlineUsers: [],
   loading: true,
   error: null,
 
   setChats: (chats) => set({ chats }),
+  addOnlineUser: (userId) =>
+    set((state) => ({
+      onlineUsers: state.onlineUsers.includes(userId)
+        ? state.onlineUsers
+        : [...state.onlineUsers, userId],
+    })),
   addChat: (chat) => set((state) => ({ chats: [...state.chats, chat] })),
   clearChats: () => set({ chats: [] }),
 
-  fetchChats: async () => {
-    set({ loading: true, error: null });
-    try {
-      const response = await api.get("/u/user/chats");
-      const data: Chat[] = response.data;
-      set({ chats: data, loading: false });
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "Unknown error",
-        loading: false,
-      });
-      console.error("Error fetching chats:", error);
-    }
-  finally {
-      set({ loading: false });
-    }
-  },
-  createChat: async (participantIds: string[], isGroup: boolean, groupName?: string) => {
-    try{
-      const response = await api.post("/u/create/chat", { participantIds, isGroup, groupName });
+ fetchChats: async () => {
+  set({ loading: true, error: null });
+  try {
+    const response = await api.get("/chats");
+    if (!response.data) throw new Error("Failed to fetch chats");
 
-      if(!response.data.ok){
-        throw new Error("Failed to create chat");
+    const data: Chat[] = response.data;
+
+    set((state) =>
+      JSON.stringify(state.chats) !== JSON.stringify(data)
+        ? { chats: data, loading: false }
+        : { loading: false }
+    );
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : "Unknown error",
+      loading: false,
+    });
+    console.error("Error fetching chats:", error);
+  }
+},
+  createChat: async (participantIds: string[], isGroup: boolean, groupName?: string) => {
+  set({ loading: true, error: null });
+  try {
+    const response = await api.post("/chats/create/chat", {
+      participantIds,
+      isGroup,
+      groupName,
+    });
+
+    if (!response.data) {
+      throw new Error("Failed to create chat");
+    }
+
+    const newChat: Chat = response.data;
+
+    set((state) => {
+      // ✅ prevent duplicates
+      const exists = state.chats.some((c) => c.id === newChat.id);
+      if (exists) {
+        return { loading: false }; // no state change if already exists
       }
-      const newChat: Chat = response.data;
-      set((state) => ({ chats: [...state.chats, newChat] }));
-    } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : "Unknown error",
-        loading: false,
-      });
-      console.error("Error creating chat:", error);
-    }
-    finally {
-      set({ loading: false });
-    }
-  },
+      return { chats: [...state.chats, newChat], loading: false };
+    });
+  } catch (error) {
+    set({
+      error: error instanceof Error ? error.message : "Unknown error",
+      loading: false,
+    });
+    console.error("Error creating chat:", error);
+  }
+},
+
 }));
 
 export default useChatStore;

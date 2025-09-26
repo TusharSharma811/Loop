@@ -3,10 +3,9 @@ import { MessageBubble } from './MessageCard';
 import { MessageInput } from './MessageInput';
 import type { User } from '../store/userStore';
 import type { Chat as Conversation } from '../store/chatStore';
-import type { Message } from '../store/messageStore';
 import useMessageStore from '../store/messageStore';
 import useUserStore from '../store/userStore';
-import ChatAppSkeleton from './skeletons/ChatLoading';
+import { MessageListSkeleton } from './skeletons/ChatAreaSkeleton';
 interface ChatAreaProps {
   conversation: Conversation | null;
   users: User[];
@@ -20,7 +19,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   const activeUser: User = users[0]; // Assuming the first user is the current user
   const { user: currentUser } = useUserStore();
   const { messages } = useMessageStore();
-  const {loading} = useMessageStore();
+  const { loading } = useMessageStore();
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
@@ -33,7 +32,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-gray-500">
+      <div className="flex-1 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
         {/* empty state */}
         <div className="text-center">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -52,14 +51,14 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
     <div className="flex-1 flex flex-col h-[80%] ">
       {/* Messages */}
       <div className="flex-1  overflow-y-auto no-scrollbar p-4 space-y-1 bg-gray-50">
-        {messages.length === 0 ? (
+        {!messages? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <p className="text-gray-500 mb-2">No messages yet</p>
               <p className="text-sm text-gray-400">Start the conversation!</p>
             </div>
           </div>
-        ) : (loading ? <ChatAppSkeleton /> :( messages && messages.length > 0 &&
+        ) : (loading ? <MessageListSkeleton /> :( messages && messages.length > 0 &&
            messages.map((message, index) => {
             const sender = message.senderId === activeUser.id ? activeUser : users.find(u => u.id === message.senderId);
             const isOwn = message.senderId === currentUser?.id;

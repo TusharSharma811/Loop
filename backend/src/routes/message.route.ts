@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { getMessages } from "../controllers/message.controller.ts";
+import messageController from "../controllers/message.controller.ts";
 import { protectRoutes } from "../middlewares/protectRoutes.ts";
 const router = Router();
 
 
-router.get("/get-messages/:chatId" , protectRoutes, getMessages);
+router.get("/get-messages/:chatId" , protectRoutes, messageController.getMessages);
 
 export default router;

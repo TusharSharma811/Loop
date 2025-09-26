@@ -2,6 +2,7 @@ import React from "react";
 import type { Chat } from "../store/chatStore";
 import useUserStore from "../store/userStore";
 import defaultImage from '../assets/default-avatar.png';
+import useChatStore from "../store/chatStore";
 interface ConversationItemProps {
   conversation: Chat;
   isActive: boolean;
@@ -14,7 +15,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   onClick,
 } ) => {
   const { user: currentUser } = useUserStore();
-  
+  const { onlineUsers } = useChatStore();
   const getConversationName = () => {
     if (conversation.isGroup && conversation.groupName) {
       return conversation.groupName;
@@ -26,8 +27,8 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   };
 
   const getConversationAvatar = () => {
-    if (conversation.isGroup && conversation.groupAvatar) {
-      return conversation.groupAvatar;
+    if (conversation.isGroup && conversation.groupName) {
+      return conversation.name || defaultImage;
     }
     const otherParticipant = conversation.participants.find((p) => p.id !== currentUser?.id);
     return otherParticipant?.avatarUrl != "" ? defaultImage : otherParticipant?.avatarUrl ;
@@ -57,13 +58,17 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
 
   const getStatusColor = () => {
     if (conversation.isGroup) return "bg-gray-400";
-    const status = conversation.participants.find(
-      (p) => p.id !== currentUser?.id
-    )?.status;
+    if(!currentUser) return "bg-gray-400";
+    const otherParticipant = conversation.participants.find((p) => p.id !== currentUser.id);
+    if (!otherParticipant) return "bg-gray-400";
+    const isOnline = onlineUsers.includes(otherParticipant.id);
+    console.log("Other Participant:", otherParticipant, "Is Online:", isOnline);
+    
+    const status = isOnline ? "online" : "offline";
     switch (status) {
       case "online":
         return "bg-green-500";
-      case "away":
+      case "offline":
         return "bg-yellow-500";
       default:
         return "bg-gray-400";
@@ -110,11 +115,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
           <p className="text-sm text-gray-600 truncate">
             {getLastMessagePreview()}
           </p>
-          {conversation.unreadCount > 0 && (
-            <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-blue-600 rounded-full">
-              {conversation.unreadCount}
-            </span>
-          )}
+        
         </div>
       </div>
     </div>

@@ -17,6 +17,7 @@ model User {
   fullname    String    @default("")
   email       String    @unique
   passwordHash String
+  refreshToken String?   // for JWT refresh tokens
   avatarUrl   String?   // URL to profile picture
   bio         String?   // Short user bio
   createdAt   DateTime  @default(now())

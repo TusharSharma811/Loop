@@ -1,6 +1,7 @@
 import { useEffect, type JSX } from "react";
 import { Navigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
+import ChatAppSkeleton from "./skeletons/ChatLoading";
 
 interface ProtectedRouteProps {
   children: JSX.Element;
@@ -15,7 +16,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }, [isAuthenticated, checkAuth]);
 
-  if (isAuthenticated === null) return <div>Loading...</div>;
+  if (isAuthenticated === null) return <div><ChatAppSkeleton /></div>;
 
   if (!isAuthenticated) return <Navigate to="/auth/signin" replace />;
 

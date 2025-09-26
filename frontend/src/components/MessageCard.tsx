@@ -67,7 +67,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           }
           shadow-sm
         `}>
-          <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+          {message.messageType === 'image' ? (
+            <img
+              src={message.content}
+              alt="User uploaded"
+              className="max-w-full rounded-lg"
+            />
+          ): <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>}
+         
 {/*           
           <div className={`flex items-center justify-end mt-1 space-x-1 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
             <span className="text-xs opacity-75">

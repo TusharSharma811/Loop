@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": false,
-
+    "types": ["vite/client"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

@@ -18,7 +18,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   connect: async () => {
     if (get().socket) return; 
 
-    const socket = io("http://localhost:3000", {
+    const socket = io(process.env.VITE_API_BASE_URL || "http://localhost:3000", {
       transports: ["websocket"],
       query: { userId: useUserStore.getState().user?.id  || "" },
     });

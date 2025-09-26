@@ -5,6 +5,7 @@ import type { Message } from "./messageStore";
 
 
 
+
 export interface Chat {
   id: string;
   name: string;
@@ -88,6 +89,8 @@ const useChatStore = create<ChatStore>((set) => ({
       if (exists) {
         return { loading: false }; // no state change if already exists
       }
+      console.log("Adding new chat:", newChat);
+      
       return { chats: [...state.chats, newChat], loading: false };
     });
   } catch (error) {

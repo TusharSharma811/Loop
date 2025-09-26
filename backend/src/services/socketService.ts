@@ -58,7 +58,7 @@ export class SocketIo {
   private registerEventHandlers(socket: Socket) {
     socket.on("joinRoom", (roomId: string) => this.handleJoinRoom(socket, roomId));
     socket.on("leaveRoom", (roomId: string) => this.handleLeaveRoom(socket, roomId));
-    socket.on("NewMessage", (msg: MessagePayload) => this.handleNewMessage(socket, msg));
+    socket.on("NewMessage", (msg: MessagePayload  , type?: string) => this.handleNewMessage(socket, msg, type));
     socket.on("disconnect", () => this.handleDisconnect(socket));
   }
 

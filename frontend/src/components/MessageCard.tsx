@@ -69,7 +69,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         `}>
           {message.messageType === 'image' ? (
             <img
-              src={JSON.parse(message.content).content}
+              src={message.content}
               alt="User uploaded"
               className="max-w-full rounded-lg"
             />

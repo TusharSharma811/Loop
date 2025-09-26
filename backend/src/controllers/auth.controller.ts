@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
-import prisma from "../lib/prismaClient.ts";
-import bcrypt from "bcryptjs";
-import { generateJWT, generateRefreshJWT } from "../utils/generateJWT.ts";
+import prisma from "../lib/prismaClient.js";
+import bcrypt from "bcryptjs"
+import { generateJWT, generateRefreshJWT } from "../utils/generateJWT.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";

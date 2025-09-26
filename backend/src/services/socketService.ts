@@ -1,7 +1,7 @@
 
-import { publisher, subscriber } from "../lib/redisClient.ts";
+import { publisher, subscriber } from "../lib/redisClient.js";
 import { Server, Socket } from "socket.io";
-import prisma from "../lib/prismaClient.ts";
+import prisma from "../lib/prismaClient.js";
 
 interface MessagePayload {
   id?: string;

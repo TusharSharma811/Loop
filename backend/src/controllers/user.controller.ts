@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../lib/prismaClient.ts";
+import prisma from "../lib/prismaClient.js";
 import dotenv from "dotenv";
 dotenv.config();
 

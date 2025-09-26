@@ -1,6 +1,6 @@
 
 import type { Response } from "express";
-import prisma from "../lib/prismaClient.ts";
+import prisma from "../lib/prismaClient.js";
 import type { RequestWithUser } from "../middlewares/protectRoutes.ts";
 
 class MessageController {

@@ -1,5 +1,5 @@
 // backend/services/uploadService.js
-import cloudinary from "../lib/cloudinaryClient.ts";
+import cloudinary from "../lib/cloudinaryClient.js";
 import fs from "fs";
 
 class UploadService {

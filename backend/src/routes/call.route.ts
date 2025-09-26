@@ -1,6 +1,6 @@
 import Router from 'express';
-import { getToken } from '../controllers/calls.controller.ts';
-import { protectRoutes } from '../middlewares/protectRoutes.ts';
+import { getToken } from '../controllers/calls.controller.js';
+import { protectRoutes } from '../middlewares/protectRoutes.js';
 
 const router = Router();
 

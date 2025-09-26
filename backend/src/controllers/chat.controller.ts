@@ -224,6 +224,38 @@ class ChatController {
       res.status(500).json({ error: "Internal server error" });
     }
   };
+
+  deleteChat = async (req: RequestWithUser, res: Response) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const userId = req.user.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const chatId : any= req.params.id;
+      if (!chatId) {
+        return res.status(400).json({ error: "Invalid chat ID" });
+      }
+      const chat = await prisma.chat.findFirst({
+        where: {
+          id: chatId,
+          participants: { some: { userId } },
+        },
+      });
+      if (!chat) {
+        return res
+          .status(404)
+          .json({ error: "Chat not found or access denied" });
+      }
+      await prisma.chat.delete({ where: { id: chatId } });
+      res.status(200).json({ message: "Chat deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  };
 }
 
 export default new ChatController();

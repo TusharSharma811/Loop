@@ -1,9 +1,12 @@
-import {  Menu } from "lucide-react";
+import {  Menu  } from "lucide-react";
 import useUserStore from "../store/userStore";
 import type { Chat } from "../store/chatStore";
 import defaultAvatar from "../assets/default-avatar.png";
 import { useCallStreamStore } from "../store/callStreamStore";
-
+import DropdownMenu from "./DropDownMenu";
+import useChatStore from "../store/chatStore";
+import ConfirmationModal from "./ConfirmationModal";
+import { useState } from "react";
 interface Props {
   conversation: Chat | null;
   onSidebarToggle: () => void;
@@ -14,8 +17,27 @@ export const ChatHeader: React.FC<Props> = ({
   onSidebarToggle,
 }) => {
   const { user } = useUserStore();
+  const {deleteChat} = useChatStore();
   const { client, isInCall, outgoingCall } = useCallStreamStore();
+   const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleDeleteRequest = () => {
+    console.log('Delete requested. Opening confirmation modal...');
+    setIsModalOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    console.log('DELETING CHAT...');
 
+    if (conversation) {
+      await deleteChat(conversation.id);
+    }
+    alert('Chat has been deleted.');
+    setIsModalOpen(false); // Close the modal after action
+  };
+
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   // const handleAudioCall = async () => {
   //   if (!client || !conversation || !user) {
   //     alert("Call service not initialized. Please try again later.");
@@ -161,13 +183,14 @@ export const ChatHeader: React.FC<Props> = ({
           </button> */}
 
           {/* More Options */}
-          {/* <button 
-            className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-all duration-200"
-            title="More options"
-          >
-            <MoreVertical className="h-5 w-5" />
-          </button> */}
-
+          { <DropdownMenu onDelete={handleDeleteRequest} /> }
+           <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmDelete}
+        title="Delete Chat"
+        message="Are you sure you want to delete this conversation? This action is permanent and cannot be undone."
+      />
           {/* Call Status Indicator */}
           {(isInCall || outgoingCall) && (
             <div className="items-center text-xs text-green-600 ml-2 hidden sm:flex">

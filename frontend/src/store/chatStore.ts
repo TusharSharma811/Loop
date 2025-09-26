@@ -29,6 +29,7 @@ type ChatStore = {
   clearChats: () => void;
   fetchChats: () => Promise<void>;
   createChat: (participantIds: string[], isGroup: boolean, groupName?: string) => Promise<void>;
+  deleteChat: (chatId: string) => Promise<void>;
 };
 
 const useChatStore = create<ChatStore>((set) => ({
@@ -101,6 +102,22 @@ const useChatStore = create<ChatStore>((set) => ({
     console.error("Error creating chat:", error);
   }
 },
+  deleteChat: async (chatId: string) => {
+    set({ loading: true, error: null });
+    try {
+      await api.delete(`/chats/delete/${chatId}`);
+      set((state) => ({
+        chats: state.chats.filter((chat) => chat.id !== chatId),
+        loading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : "Unknown error",
+        loading: false,
+      });
+      console.error("Error deleting chat:", error);
+    }
+  },
 
 }));
 

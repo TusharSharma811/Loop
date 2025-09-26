@@ -72,7 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Sidebar */}
-      {loading ? <ChatListSkeleton /> :
+      
       <div
         className={`fixed lg:relative inset-y-0 left-0 z-20
           w-80 bg-white border-r border-gray-200 
@@ -82,6 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           } h-full flex flex-col [scrollbar-gutter:none]`}
       >
         {/* Header */}
+
         <div className="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center">
             <MessageCircle className="h-6 w-6 text-blue-600 mr-2" />
@@ -126,6 +127,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Conversations */}
+        {loading ? (
+        <div className="p-4 flex-1 overflow-y-auto">
+          <ChatListSkeleton />
+        </div>
+      ) : (
         <div className="overflow-y-auto flex-1">
           {filteredConversations.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
@@ -141,9 +147,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               />
             ))
           )}
-        </div>
-      </div>
+        </div>)
 }
+      </div>
     </>
   );
 };

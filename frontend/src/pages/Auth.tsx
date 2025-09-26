@@ -104,12 +104,12 @@ export const AuthPage: React.FC = () => {
 
 
   const popup = window.open(
-    "http://localhost:3000/api/v1/auth/google-login",
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/google-login`,
     "Google OAuth",
     `width=${width},height=${height},left=${left},top=${top}`
   );
   window.addEventListener("message", (event) => {
-    if (event.origin !== "http://localhost:3000") return; // security check
+    if (event.origin !== import.meta.env.VITE_API_BASE_URL) return; // security check
     if (event.data.type === "google-auth-success") {
       console.log("User logged in!");
       popup?.close();

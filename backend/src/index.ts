@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173' , 'https://dell-unprecipitated-degradingly.ngrok-free.dev' ],
   credentials: true,
 }));
 process.on("uncaughtException", (err) => {
@@ -31,7 +31,7 @@ process.on("unhandledRejection", (reason) => {
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
+    origin: ['http://localhost:5173', 'https://dell-unprecipitated-degradingly.ngrok-free.dev'],
     credentials: true,
   },
 });

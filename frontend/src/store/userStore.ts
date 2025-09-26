@@ -3,6 +3,7 @@ import api from '../lib/axiosInstance';
 
 export interface User {
     id: string;
+    userId? : string;
     fullname: string;
     username: string;
     email: string;

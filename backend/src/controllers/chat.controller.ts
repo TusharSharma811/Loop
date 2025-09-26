@@ -164,10 +164,17 @@ class ChatController {
               user: { select: { id: true, username: true, fullname: true } },
             },
           },
+          messages: { select: { id: true, content: true, createdAt: true, senderId: true } },
         },
       });
-
-      res.status(201).json(newChat);
+      const formatted = {
+        id: newChat.id,
+        isGroup: newChat.isGroup,
+        name: newChat.name,
+        participants: newChat.participants.map((p) => p.user),
+        lastMessage: newChat.messages[0] || null,
+      };
+      res.status(201).json(formatted);
     } catch (error) {
       console.error("Error creating chat:", error);
       res.status(500).json({ error: "Internal server error" });

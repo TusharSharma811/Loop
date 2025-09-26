@@ -22,6 +22,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
     }
     return (
       conversation.participants.find((p) => p.id !== currentUser?.id)?.fullname ||
+  
       "Unknown"
     );
   };

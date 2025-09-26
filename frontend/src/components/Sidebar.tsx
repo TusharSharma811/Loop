@@ -3,10 +3,11 @@ import { Search, Plus, Settings, MessageCircle } from "lucide-react";
 import { ConversationItem } from "./ConversationItem";
 import useSearchUserStore from "../store/searchUserStore";
 import useUserStore from "../store/userStore";
-import { type Chat } from "../store/chatStore";
+import useChatStore, { type Chat } from "../store/chatStore";
 import { useSocketStore } from "../store/socketStore";
 import { useNavigate } from "react-router-dom";
 import useMessageStore from "../store/messageStore";
+import { ChatListSkeleton } from "./skeletons/ChatAreaSkeleton";
 
 
 interface SidebarProps {
@@ -24,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onToggle,
 }) => {
+  const {loading} = useChatStore();
   const [searchQuery, setSearchQuery] = useState("");
 
   // ✅ Use selectors so Sidebar doesn’t re-render unnecessarily
@@ -70,6 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Sidebar */}
+      {loading ? <ChatListSkeleton /> :
       <div
         className={`fixed lg:relative inset-y-0 left-0 z-20
           w-80 bg-white border-r border-gray-200 
@@ -140,6 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
       </div>
+}
     </>
   );
 };

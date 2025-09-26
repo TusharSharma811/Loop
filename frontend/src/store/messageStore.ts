@@ -37,7 +37,6 @@ export interface MessageStore {
         throw new Error("Failed to fetch messages");
       }
       console.log("Fetched messages:", response.data);
-      await new Promise(resolve => setTimeout(resolve, 500)); 
       const data: Message[] = response.data.messages;
       set({ messages: data, loading: false , cursor: response.data.nextCursor });
     } catch (error) {

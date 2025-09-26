@@ -2,7 +2,7 @@ import {motion} from "motion/react";
 
 export default function ChatAppSkeleton() {
   return (
-    <motion.div initial={{ opacity: 0.5 }} animate={{ opacity: 0 }}  transition={{ duration: 2 }} className="min-h-screen flex bg-gray-50 dark:bg-gray-900">
+    <motion.div initial={{ opacity: 0.5 }} animate={{ opacity: 0 }}   className="min-h-screen flex bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Sidebar */}
       <aside className="w-80 p-4 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
         <div className="flex items-center gap-3 mb-6">

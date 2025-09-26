@@ -43,6 +43,10 @@ app.use("/api/v1/chats",chatrouter)
 app.use("/api/v1/messages",messageRouter)
 app.use("/api/v1/calls", callRouter);
 app.use("/api/v1/user", userRouter);
+
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
 async function startServer() {
   try {
     const PORT = process.env.PORT || 3000;

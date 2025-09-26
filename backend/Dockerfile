@@ -1,38 +1,37 @@
-# ---- Builder Stage ----
-FROM node:24-alpine AS builder
-
+# Backend1 Builder
+FROM node:24-alpine AS builder-backend1
 WORKDIR /app
-
-# Copy only package files first for caching
-COPY package*.json ./
-
-# Install dev dependencies for building TS
+COPY backend1/package*.json ./
 RUN npm install
-
-# Copy rest of the source
-COPY . .
-
-# Fix: ensure TS build outputs to /app/dist
+COPY backend1 ./
 RUN npm run build
 
-# ---- Runtime Stage ----
-FROM node:24-alpine3.21 AS runtime
-
+# Backend2 Builder
+FROM node:24-alpine AS builder-backend2
 WORKDIR /app
+COPY backend2/package*.json ./
+RUN npm install
+COPY backend2 ./
+RUN npm run build
 
-# Copy only production dependencies
-COPY package*.json ./
+# Backend1 Runtime
+FROM node:24-alpine AS runtime-backend1
+WORKDIR /app
+COPY backend1/package*.json ./
 RUN npm install --only=production
-
-# Copy prisma schema
-COPY prisma ./prisma
+COPY backend1/prisma ./prisma
 RUN npx prisma generate
-
-# Copy compiled code from builder
-COPY --from=builder /app/dist ./dist
-
-# Expose port
+COPY --from=builder-backend1 /app/dist ./dist
 EXPOSE 3000
+CMD ["node", "dist/server.js"]
 
-# Start server
+# Backend2 Runtime
+FROM node:24-alpine AS runtime-backend2
+WORKDIR /app
+COPY backend2/package*.json ./
+RUN npm install --only=production
+COPY backend2/prisma ./prisma
+RUN npx prisma generate
+COPY --from=builder-backend2 /app/dist ./dist
+EXPOSE 3000
 CMD ["node", "dist/server.js"]

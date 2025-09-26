@@ -1,4 +1,4 @@
-import { Phone, Video, MoreVertical, Menu } from "lucide-react";
+import {  Menu } from "lucide-react";
 import useUserStore from "../store/userStore";
 import type { Chat } from "../store/chatStore";
 import defaultAvatar from "../assets/default-avatar.png";
@@ -14,59 +14,59 @@ export const ChatHeader: React.FC<Props> = ({
   onSidebarToggle,
 }) => {
   const { user } = useUserStore();
-  const { client, initiateCall, isInCall, outgoingCall } = useCallStreamStore();
+  const { client, isInCall, outgoingCall } = useCallStreamStore();
 
-  const handleAudioCall = async () => {
-    if (!client || !conversation || !user) {
-      alert("Call service not initialized. Please try again later.");
-      return;
-    }
+  // const handleAudioCall = async () => {
+  //   if (!client || !conversation || !user) {
+  //     alert("Call service not initialized. Please try again later.");
+  //     return;
+  //   }
 
-    if (isInCall || outgoingCall) {
-      alert("You are already in a call or have an outgoing call.");
-      return;
-    }
+  //   if (isInCall || outgoingCall) {
+  //     alert("You are already in a call or have an outgoing call.");
+  //     return;
+  //   }
 
-    try {
-      const otherParticipant = conversation.participants.find((p) => p.id !== user.id);
-      if (!otherParticipant) {
-        alert("Unable to identify call recipient.");
-        return;
-      }
+  //   try {
+  //     const otherParticipant = conversation.participants.find((p) => p.id !== user.id);
+  //     if (!otherParticipant) {
+  //       alert("Unable to identify call recipient.");
+  //       return;
+  //     }
 
-      await initiateCall(otherParticipant.id, false, otherParticipant.fullname);
-      console.log("✅ Audio call initiated");
-    } catch (error) {
-      console.error("❌ Failed to start audio call:", error);
-      alert("Failed to start call. Please try again.");
-    }
-  };
+  //     await initiateCall(otherParticipant.id, false, otherParticipant.fullname);
+  //     console.log("✅ Audio call initiated");
+  //   } catch (error) {
+  //     console.error("❌ Failed to start audio call:", error);
+  //     alert("Failed to start call. Please try again.");
+  //   }
+  // };
 
-  const handleVideoCall = async () => {
-    if (!client || !conversation || !user) {
-      alert("Call service not initialized. Please try again later.");
-      return;
-    }
+  // const handleVideoCall = async () => {
+  //   if (!client || !conversation || !user) {
+  //     alert("Call service not initialized. Please try again later.");
+  //     return;
+  //   }
 
-    if (isInCall || outgoingCall) {
-      alert("You are already in a call or have an outgoing call.");
-      return;
-    }
+  //   if (isInCall || outgoingCall) {
+  //     alert("You are already in a call or have an outgoing call.");
+  //     return;
+  //   }
 
-    try {
-      const otherParticipant = conversation.participants.find((p) => p.id !== user.id);
-      if (!otherParticipant) {
-        alert("Unable to identify call recipient.");
-        return;
-      }
+  //   try {
+  //     const otherParticipant = conversation.participants.find((p) => p.id !== user.id);
+  //     if (!otherParticipant) {
+  //       alert("Unable to identify call recipient.");
+  //       return;
+  //     }
 
-      await initiateCall(otherParticipant.id, true, otherParticipant.fullname);
-      console.log("✅ Video call initiated");
-    } catch (error) {
-      console.error("❌ Failed to start video call:", error);
-      alert("Failed to start video call. Please try again.");
-    }
-  };
+  //     await initiateCall(otherParticipant.id, true, otherParticipant.fullname);
+  //     console.log("✅ Video call initiated");
+  //   } catch (error) {
+  //     console.error("❌ Failed to start video call:", error);
+  //     alert("Failed to start video call. Please try again.");
+  //   }
+  // };
 
   if (!conversation) {
     return (
@@ -117,7 +117,7 @@ export const ChatHeader: React.FC<Props> = ({
 
         <div className="flex items-center space-x-2">
           {/* Audio Call Button */}
-          <button
+          {/* <button
             className={`p-2 rounded-full transition-all duration-200 group ${
               isInCall || outgoingCall
                 ? 'text-gray-400 cursor-not-allowed'
@@ -136,10 +136,10 @@ export const ChatHeader: React.FC<Props> = ({
             disabled={!client || isInCall || !!outgoingCall}
           >
             <Phone className="h-5 w-5 group-hover:scale-110 transition-transform" />
-          </button>
+          </button> */}
 
           {/* Video Call Button */}
-          <button
+          {/* <button
             className={`p-2 rounded-full transition-all duration-200 group ${
               isInCall || outgoingCall
                 ? 'text-gray-400 cursor-not-allowed'
@@ -158,15 +158,15 @@ export const ChatHeader: React.FC<Props> = ({
             disabled={!client || isInCall || !!outgoingCall}
           >
             <Video className="h-5 w-5 group-hover:scale-110 transition-transform" />
-          </button>
+          </button> */}
 
           {/* More Options */}
-          <button 
+          {/* <button 
             className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-all duration-200"
             title="More options"
           >
             <MoreVertical className="h-5 w-5" />
-          </button>
+          </button> */}
 
           {/* Call Status Indicator */}
           {(isInCall || outgoingCall) && (

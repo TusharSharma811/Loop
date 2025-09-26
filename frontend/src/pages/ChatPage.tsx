@@ -86,7 +86,7 @@ export const ChatPage: React.FC = () => {
           {/* Sidebar */}
           <div className="flex h-screen">
             <Sidebar
-              conversations={chats || []}
+              // conversations={chats || []}
               activeConversationId={activeConversationId}
               onConversationSelect={handleConversationSelect}
               isOpen={sidebarOpen}

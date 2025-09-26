@@ -11,7 +11,7 @@ import { ChatListSkeleton } from "./skeletons/ChatAreaSkeleton";
 
 
 interface SidebarProps {
-  conversations: Chat[];
+  
   activeConversationId: string | null;
   onConversationSelect: (conversationId: string) => void;
   isOpen: boolean;
@@ -19,13 +19,13 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  conversations,
+  
   activeConversationId,
   onConversationSelect,
   isOpen,
   onToggle,
 }) => {
-  const {loading} = useChatStore();
+  const {chats:conversations , loading} = useChatStore();
   const [searchQuery, setSearchQuery] = useState("");
 
   // ✅ Use selectors so Sidebar doesn’t re-render unnecessarily

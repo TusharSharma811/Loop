@@ -234,7 +234,7 @@ class ChatController {
       if (!userId) {
         return res.status(401).json({ error: "Unauthorized" });
       }
-      const chatId : any= req.params.id;
+      const chatId : any= req.params.chatId;
       if (!chatId) {
         return res.status(400).json({ error: "Invalid chat ID" });
       }

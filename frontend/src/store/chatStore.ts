@@ -6,6 +6,7 @@ import type { Message } from "./messageStore";
 
 
 
+
 export interface Chat {
   id: string;
   name: string;
@@ -70,7 +71,7 @@ const useChatStore = create<ChatStore>((set) => ({
   }
 },
   createChat: async (participantIds: string[], isGroup: boolean, groupName?: string) => {
-  set({ loading: true, error: null });
+  set({ error: null });
   try {
     const response = await api.post("/chats/create/chat", {
       participantIds,
@@ -88,11 +89,11 @@ const useChatStore = create<ChatStore>((set) => ({
       // ✅ prevent duplicates
       const exists = state.chats.some((c) => c.id === newChat.id);
       if (exists) {
-        return { loading: false }; // no state change if already exists
+        return { chats: state.chats  };
       }
       console.log("Adding new chat:", newChat);
       
-      return { chats: [...state.chats, newChat], loading: false };
+      return { chats: [...state.chats, newChat]};
     });
   } catch (error) {
     set({
@@ -103,17 +104,19 @@ const useChatStore = create<ChatStore>((set) => ({
   }
 },
   deleteChat: async (chatId: string) => {
-    set({ loading: true, error: null });
+    set({  error: null });
     try {
-      await api.delete(`/chats/delete/${chatId}`);
-      set((state) => ({
-        chats: state.chats.filter((chat) => chat.id !== chatId),
-        loading: false,
-      }));
+      const deleteRequest = await api.delete(`/chats/delete/${chatId}`);
+      if(deleteRequest.status !== 200) {
+        throw new Error("Failed to delete chat");
+        
+      }
+          set((state) => ({
+            chats: state.chats.filter((chat) => chat.id !== chatId),
+          }));
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "Unknown error",
-        loading: false,
       });
       console.error("Error deleting chat:", error);
     }

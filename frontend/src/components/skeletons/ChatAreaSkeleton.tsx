@@ -14,7 +14,7 @@ export function ChatListItemSkeleton() {
 
 export function ChatListSkeleton({ count = 8 }: { count?: number }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 overflow-hidden h-screen">
       {Array.from({ length: count }).map((_, i) => (
         <ChatListItemSkeleton key={i} />
       ))}

@@ -19,6 +19,8 @@ services:
       - ./.env
     ports:
       - "3002:3000"
+    depends_on:
+      - backend1
 
   nginx:
     image: nginx:alpine

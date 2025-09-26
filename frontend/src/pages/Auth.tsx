@@ -68,7 +68,7 @@ export const AuthPage: React.FC = () => {
     setIsLoading(true);
     try {
       const endpoint = isSignUp ? "/auth/register" : "/auth/login";
-      const response = await fetch(`/api/v1${endpoint}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

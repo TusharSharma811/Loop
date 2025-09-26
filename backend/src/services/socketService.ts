@@ -1,4 +1,3 @@
-
 import { publisher, subscriber } from "../lib/redisClient.js";
 import { Server, Socket } from "socket.io";
 import prisma from "../lib/prismaClient.js";
@@ -21,12 +20,11 @@ export class SocketIo {
     this.io = io;
   }
 
-  
   async init() {
     this.io.on("connection", async (socket: Socket) => {
       console.log("New client connected:", socket.id);
       this.registerEventHandlers(socket);
-      const userId : string= socket.handshake.query.userId as string;
+      const userId: string = socket.handshake.query.userId as string;
       if (userId) {
         console.log("User ID from query:", userId);
       }
@@ -34,31 +32,35 @@ export class SocketIo {
         where: {
           participants: {
             some: {
-              userId: userId
+              userId: userId,
             },
           },
-         
         },
-         select: { id: true },
+        select: { id: true },
       });
       console.log("User's chats:", chats);
-      
-      chats.forEach((chatId)=>{
+
+      chats.forEach((chatId) => {
         socket.join(chatId.id);
         console.log("User", userId, "joined room:", chatId.id);
-        
-        socket.to(chatId.id).emit("online-user" , userId)
-      })
+
+        socket.to(chatId.id).emit("online-user", userId);
+      });
     });
 
     await this.setupRedisSubscriptions();
   }
 
- 
   private registerEventHandlers(socket: Socket) {
-    socket.on("joinRoom", (roomId: string) => this.handleJoinRoom(socket, roomId));
-    socket.on("leaveRoom", (roomId: string) => this.handleLeaveRoom(socket, roomId));
-    socket.on("NewMessage", (msg: MessagePayload  , type?: string) => this.handleNewMessage(socket, msg, type));
+    socket.on("joinRoom", (roomId: string) =>
+      this.handleJoinRoom(socket, roomId)
+    );
+    socket.on("leaveRoom", (roomId: string) =>
+      this.handleLeaveRoom(socket, roomId)
+    );
+    socket.on("NewMessage", (msg: MessagePayload, type?: string) =>
+      this.handleNewMessage(socket, msg, type)
+    );
     socket.on("disconnect", () => this.handleDisconnect(socket));
   }
 
@@ -67,49 +69,54 @@ export class SocketIo {
     console.log(`Socket ${socket.id} joined room ${roomId}`);
   }
 
-
   private handleLeaveRoom(socket: Socket, roomId: string) {
     socket.leave(roomId);
     console.log(`Socket ${socket.id} left room ${roomId}`);
   }
 
-  
-  private async handleNewMessage(socket: Socket, message: MessagePayload , type?: string) {
+  private async handleNewMessage(
+    socket: Socket,
+    message: MessagePayload,
+    type?: string
+  ) {
     if (!message.content || !message.chatId || !message.senderId) {
       console.error("Invalid message data:", message);
       return;
     }
-    let newMessage;
+    let newMessage : any;
     try {
-      if(type === "image"){
-        const fileData = JSON.parse(message.content); 
-         const uploadResult = await cloudinaryClient.uploader.upload(fileData.content, {
-          folder: "chat_images", 
-          resource_type: "auto"
-        });
+      if (type === "image") {
+        const fileData = JSON.parse(message.content);
+        const uploadResult = await cloudinaryClient.uploader.upload(
+          fileData.content,
+          {
+            folder: "chat_images",
+            resource_type: "auto",
+          }
+        );
         const contentToStore = uploadResult.secure_url;
-         newMessage = await prisma.message.create({
-        data: {
-          chatId: message.chatId,
-          senderId: message.senderId,
-          content: contentToStore,
-          messageType: message.messageType,
-          timeStamp: new Date(),
-        },
-      });
-      }
-      else{
+        console.log("Image uploaded to Cloudinary:", contentToStore);
+
         newMessage = await prisma.message.create({
-        data: {
-          chatId: message.chatId,
-          senderId: message.senderId,
-          content: message.content,
-          timeStamp: new Date(),
-          messageType: message.messageType,
-        },
-      });
+          data: {
+            chatId: message.chatId,
+            senderId: message.senderId,
+            content: contentToStore,
+            messageType: message.messageType,
+            timeStamp: new Date(),
+          },
+        });
+      } else {
+        newMessage = await prisma.message.create({
+          data: {
+            chatId: message.chatId,
+            senderId: message.senderId,
+            content: message.content,
+            timeStamp: new Date(),
+            messageType: message.messageType,
+          },
+        });
       }
-      
 
       console.log("Message saved:", newMessage);
 
@@ -127,11 +134,9 @@ export class SocketIo {
     }
   }
 
- 
   private handleDisconnect(socket: Socket) {
     console.log("Client disconnected:", socket.id);
   }
-
 
   private async setupRedisSubscriptions() {
     if (this.isSubscribed) return;

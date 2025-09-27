@@ -77,15 +77,17 @@ export class SocketIo {
   private async handleNewMessage(
     socket: Socket,
     message: MessagePayload,
-    type?: string
+    messageType?: string
   ) {
     if (!message.content || !message.chatId || !message.senderId) {
       console.error("Invalid message data:", message);
       return;
     }
     let newMessage : any;
+    console.log("Received new message:", message, "of type:", messageType);
+    
     try {
-      if (type === "image") {
+      if (messageType === "image") {
         const fileData = JSON.parse(message.content);
         const uploadResult = await cloudinaryClient.uploader.upload(
           fileData.content,

@@ -18,8 +18,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeUser: User = users[0]; // Assuming the first user is the current user
   const { user: currentUser } = useUserStore();
-  const { messages } = useMessageStore();
-  const { loading } = useMessageStore();
+  const { messages, loading } = useMessageStore();
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
@@ -58,7 +58,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
               <p className="text-sm text-gray-400">Start the conversation!</p>
             </div>
           </div>
-        ) : (loading ? <MessageListSkeleton /> :( messages && messages.length > 0 &&
+        ) : (loading || !messages ? <MessageListSkeleton /> :( messages && messages.length > 0 &&
            messages.map((message, index) => {
             const sender = message.senderId === activeUser.id ? activeUser : users.find(u => u.id === message.senderId);
             const isOwn = message.senderId === currentUser?.id;

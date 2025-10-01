@@ -15,7 +15,7 @@ const PublicRouteWrapper: React.FC<Props> = ({ children }) => {
     }
   }, [isAuthenticated, checkAuth]);
 
-  if (isAuthenticated === null) return null; // or a loading spinner
+  if (isAuthenticated === null) return null; 
 
   if (isAuthenticated) {
     return <Navigate to="/chat" replace />;

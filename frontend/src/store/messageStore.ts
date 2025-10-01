@@ -55,7 +55,9 @@ export interface MessageStore {
         timeStamp: new Date(),
         statuses: [], 
       };
+      if(messageType !== "image") {
       set((state) => ({ messages: [...state.messages, message] }));
+      }
       io.emit("NewMessage", message , messageType);
     } catch (error) {
       console.error("Error sending message:", error);

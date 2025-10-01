@@ -16,7 +16,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   users
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const activeUser: User = users[0]; // Assuming the first user is the current user
+  const activeUser: User = users[0]; 
   const { user: currentUser } = useUserStore();
   const { messages, loading } = useMessageStore();
 
@@ -24,7 +24,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({
         block: "end",        // 👈 stay at bottom of container
-        inline: "nearest"    // 👈 don’t scroll horizontally
+        inline: "nearest"    
       });
     }
   }, [messages]);

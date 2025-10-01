@@ -34,7 +34,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
     socket.on("chat-message", (msg) => {
       console.log("📩 New message:", msg);
       const user = useUserStore.getState().user;
-      if (msg.message.senderId === user?.id) return;
+      if (msg.message.senderId === user?.id && msg.message.messageType !== "image") return;
       const messageStore = useMessageStore.getState();
       
       messageStore.addMessage(msg.message as Message);

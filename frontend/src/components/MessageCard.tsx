@@ -71,7 +71,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             <img
               src={message.content}
               alt="User uploaded"
-              className="max-w-full rounded-lg"
+              className="max-w-full rounded-lg h-[256px] w-[256px] object-cover"
             />
           ): <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>}
          

@@ -27,7 +27,7 @@ const CallManagerWrapper = () => {
 export const ChatPage: React.FC = () => {
   const { fetchChats, chats, loading: chatLoading } = useChatStore();
   const { modalOpen } = useSearchUserStore();
-  const { loading, user } = useUserStore();
+  const { loading , user } = useUserStore();
    const { fetchClient, client } = useCallStreamStore();
   const [activeConversationId, setActiveConversationId] = useState<
     string | null
@@ -74,7 +74,7 @@ export const ChatPage: React.FC = () => {
 
   return (
     <>
-      {!client || loading || chatLoading ? (
+      {!client || chatLoading || loading ? (
         <ChatAppSkeleton />
       ) : (
             <StreamVideo client={client}>

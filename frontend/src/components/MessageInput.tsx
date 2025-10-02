@@ -3,6 +3,7 @@ import { Send, Paperclip, Smile, X } from 'lucide-react';
 import useMessageStore from '../store/messageStore';
 import { useSocketStore } from '../store/socketStore';
 import useUserStore from '../store/userStore';
+import CommandPalette from './CommandPalete';
 
 
 interface MessageInputProps {
@@ -16,6 +17,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 }) => {
   const [message, setMessage] = useState('');
   const [uploadError, setUploadError] = useState('');
+  const [showCommands, setShowCommands] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -34,6 +36,10 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
+    if(e.key === '/' && message === '') {
+      e.preventDefault();
+      setShowCommands(prev => !prev);
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e as React.FormEvent);
@@ -79,6 +85,15 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   };
 
   return (
+    <>
+    {
+      showCommands && (
+        <div className="absolute bottom-16 left-4 right-4 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+          <div className="p-4 border-b border-gray-200">
+            <CommandPalette />
+          </div>
+        </div>
+      )}
     <div className="p-4 border-t border-gray-200 bg-white">
       <form onSubmit={handleSubmit} className="flex items-end space-x-2">
         {/* The hidden input that actually handles the file selection */}
@@ -126,6 +141,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         </div>
       )}
     </div>
+    </>
   );
 };
 

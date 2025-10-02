@@ -12,7 +12,6 @@ import PublicRouteWrapper from './components/PublicRouteWrapper';
 import useUserStore from './store/userStore';
 import { useSocketStore } from './store/socketStore';
 
-import ChatAppSkeleton from './components/skeletons/ChatLoading';
 import Settings from './pages/Settings';
 
 
@@ -38,17 +37,14 @@ function App() {
     init();
   }, [user, fetchUser, connect]);
 
-  // --- Loading / Error states ---
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <ChatAppSkeleton />
-      </div>
+      <LandingPage />
     );
   }
  
 
-  // --- Main App Content ---
+  
   return (
 
       <BrowserRouter>

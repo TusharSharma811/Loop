@@ -13,6 +13,7 @@ import useUserStore from './store/userStore';
 import { useSocketStore } from './store/socketStore';
 
 import Settings from './pages/Settings';
+import ChatAppSkeleton from './components/skeletons/ChatLoading';
 
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
 
   if (isLoading) {
     return (
-      <LandingPage />
+      <ChatAppSkeleton />
     );
   }
  

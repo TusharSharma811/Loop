@@ -86,15 +86,16 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   return (
     <>
-    {
+    
+    <div className="p-4 border-t border-gray-200 bg-white relative">
+      {
       showCommands && (
-        <div className="absolute bottom-16 left-4 right-4 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+        <div className="absolute bottom-16 left-4 right-4 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 max-w-3xs overflow-y-auto">
           <div className="p-4 border-b border-gray-200">
             <CommandPalette />
           </div>
         </div>
       )}
-    <div className="p-4 border-t border-gray-200 bg-white">
       <form onSubmit={handleSubmit} className="flex items-end space-x-2">
         {/* The hidden input that actually handles the file selection */}
         <input 

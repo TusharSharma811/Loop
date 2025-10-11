@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageCircle, Users, Shield, Zap, Star, ArrowRight } from 'lucide-react';
+import { MessageCircle, Users, Zap, Star, ArrowRight, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -12,13 +12,13 @@ const features = [
     },
     {
       icon: <Users className="h-6 w-6" />,
-      title: "Group Chats",
-      description: "Create groups, manage members, and collaborate seamlessly"
+      title: "One-to-One Chats",
+      description: "Connect and collaborate seamlessly"
     },
     {
-      icon: <Shield className="h-6 w-6" />,
-      title: "End-to-End Security",
-      description: "Your conversations are protected with enterprise-grade encryption"
+      icon: <Image className="h-6 w-6" />,
+      title: "Image sharing",
+      description: "Share images seamlessly"
     },
     {
       icon: <Zap className="h-6 w-6" />,

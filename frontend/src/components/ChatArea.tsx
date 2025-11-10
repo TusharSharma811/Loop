@@ -50,17 +50,22 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   return (
     <div className="flex-1 flex flex-col h-[80%] ">
       {/* Messages */}
-      <div className="flex-1  overflow-y-auto no-scrollbar p-4 space-y-1 bg-gray-50">
-        {!messages? (
+      <div className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-1 bg-gray-50">
+        {loading ? (
+          <MessageListSkeleton />
+        ) : !messages || messages.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <p className="text-gray-500 mb-2">No messages yet</p>
               <p className="text-sm text-gray-400">Start the conversation!</p>
             </div>
           </div>
-        ) : (loading || !messages ? <MessageListSkeleton /> :( messages && messages.length > 0 &&
-           messages.map((message, index) => {
-            const sender = message.senderId === activeUser.id ? activeUser : users.find(u => u.id === message.senderId);
+        ) : (
+          messages.map((message, index) => {
+            const sender =
+              message.senderId === activeUser.id
+                ? activeUser
+                : users.find((u) => u.id === message.senderId);
             const isOwn = message.senderId === currentUser?.id;
             const prevMessage = index > 0 ? messages[index - 1] : null;
             const showAvatar = !prevMessage || prevMessage.senderId !== message.senderId;
@@ -74,7 +79,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 showAvatar={showAvatar}
               />
             );
-          }))
+          })
         )}
         <div ref={messagesEndRef} />
       </div>

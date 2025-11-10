@@ -51,6 +51,7 @@ model ChatParticipant {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([chatId, userId])
+  @@index([userId])
 }
 
 model Message {
@@ -66,6 +67,8 @@ model Message {
   chat   Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender User? @relation(fields: [senderId], references: [id], onDelete: SetNull)
   statuses MessageStatus[]
+
+  @@index([chatId, createdAt])
 }
 
 model MessageStatus {
@@ -80,6 +83,7 @@ model MessageStatus {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([messageId, userId])
+  @@index([messageId])
 }
 
 

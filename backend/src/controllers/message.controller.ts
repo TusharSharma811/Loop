@@ -2,6 +2,7 @@
 import type { Response } from "express";
 import prisma from "../lib/prismaClient.js";
 import type { RequestWithUser } from "../middlewares/protectRoutes.ts";
+import logger from "../utils/logger.js";
 
 class MessageController {
   /**
@@ -51,7 +52,7 @@ class MessageController {
         nextCursor,
       });
     } catch (error) {
-      console.error("Error getting messages:", error);
+      logger.error("Error getting messages:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   }

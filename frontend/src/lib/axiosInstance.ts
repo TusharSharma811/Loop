@@ -1,9 +1,9 @@
-import axios, { AxiosError, type AxiosRequestConfig  } from "axios";
-import { useNavigate } from "react-router-dom";
+import axios, { AxiosError, type AxiosRequestConfig } from 'axios';
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/v1`, 
-  withCredentials: true, 
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/v1`,
+  withCredentials: true,
+  timeout: 15000, // prevent hanging requests
 });
 
 let isRefreshing = false;
@@ -21,8 +21,9 @@ api.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
-    if(error.response?.status === 500) {
-      useNavigate()("/auth/login");
+    if (error.response?.status === 500) {
+      // Avoid hook misuse; direct redirect keeps behavior similar
+      window.location.href = '/auth/login';
     }
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -40,7 +41,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        useNavigate()("/auth/login");
+        window.location.href = '/auth/login';
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

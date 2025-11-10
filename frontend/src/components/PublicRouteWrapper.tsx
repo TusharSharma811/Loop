@@ -11,7 +11,7 @@ const PublicRouteWrapper: React.FC<Props> = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated === null) {
-      checkAuth(); // run only if unknown
+      checkAuth(); 
     }
   }, [isAuthenticated, checkAuth]);
 

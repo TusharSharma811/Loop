@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (isAuthenticated === null) {
-      checkAuth(); // run once on mount
+      checkAuth(); 
     }
   }, [isAuthenticated, checkAuth]);
 

@@ -5,12 +5,14 @@ import authRoute from './routes/auth.route.js';
 import chatrouter from './routes/chat.route.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import {SocketIo} from './services/socketService.js';
-import { publisher , subscriber } from './lib/redisClient.js';
+import { SocketIo } from './services/socketService.js';
+import { publisher, subscriber } from './lib/redisClient.js';
 import messageRouter from './routes/message.route.js';
 import callRouter from './routes/call.route.js';
 import userRouter from './routes/user.route.js';
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
+import logger from './utils/logger.js';
+import errorHandler from './middlewares/errorHandler.js';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,13 +21,13 @@ app.use(cors({
   origin: ['http://localhost:5173' , 'https://loop-wheat.vercel.app'],
   credentials: true,
 }));
-process.on("uncaughtException", (err) => {
-  console.error("❌ Uncaught Exception:", err);
+process.on('uncaughtException', (err) => {
+  logger.error('❌ Uncaught Exception:', err);
   process.exit(1);
 });
 
-process.on("unhandledRejection", (reason) => {
-  console.error("❌ Unhandled Rejection:", reason);
+process.on('unhandledRejection', (reason) => {
+  logger.error('❌ Unhandled Rejection:', reason);
 });
 
 const server = createServer(app);
@@ -39,14 +41,16 @@ const io = new Server(server, {
 
 
 app.use('/api/v1/auth', authRoute);
-app.use("/api/v1/chats",chatrouter)
-app.use("/api/v1/messages",messageRouter)
-app.use("/api/v1/calls", callRouter);
-app.use("/api/v1/user", userRouter);
+app.use('/api/v1/chats', chatrouter);
+app.use('/api/v1/messages', messageRouter);
+app.use('/api/v1/calls', callRouter);
+app.use('/api/v1/user', userRouter);
 
 app.get('/', (req, res) => {
   res.send('Server is running');
 });
+// Attach error handler at the end of middleware stack
+app.use(errorHandler);
 async function startServer() {
   try {
     const PORT = process.env.PORT || 3000;
@@ -56,10 +60,10 @@ async function startServer() {
     await socketIo.init();
     
     server.listen(PORT, () => {
-      console.log('Server is running on port', PORT);
+      logger.info('Server is running on port', PORT);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server:', error);
     process.exit(1);
   }
 }

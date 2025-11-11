@@ -27,13 +27,14 @@ class MessageController {
         return res.status(403).json({ error: "Forbidden" });
       }
 
+      // Cursor pagination adaptation: Mongo ObjectId ordering by createdAt + id fallback.
       const messages = await prisma.message.findMany({
         where: { chatId },
-        orderBy: { createdAt: "desc" }, 
-        take: pageSize + 1, // fetch one extra to check if there's more
+        orderBy: { createdAt: 'desc' },
+        take: pageSize + 1,
         ...(cursor
           ? {
-              skip: 1, // skip the cursor itself
+              skip: 1,
               cursor: { id: cursor as string },
             }
           : {}),

@@ -1,18 +1,15 @@
-
-
 generator client {
   provider = "prisma-client-js"
-
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_NEON_URL")
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
 }
 
 
 model User {
-  id          String    @id @default(uuid())
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   username    String    @unique
   fullname    String    @default("")
   email       String    @unique
@@ -29,7 +26,7 @@ model User {
 }
 
 model Chat {
-  id        String    @id @default(uuid())
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String?   // null for 1-1 chats
   isGroup   Boolean   @default(false)
   createdAt DateTime  @default(now())
@@ -40,47 +37,47 @@ model Chat {
 }
 
 model ChatParticipant {
-  id       String    @id @default(uuid())
-  chatId   String
-  userId   String
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  chatId   String   @db.ObjectId
+  userId   String   @db.ObjectId
   role     String   @default("member") // admin, member
   joinedAt DateTime @default(now())
 
   // Relations
-  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat @relation(fields: [chatId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@unique([chatId, userId])
   @@index([userId])
 }
 
 model Message {
-  id          String   @id @default(uuid())
-  chatId      String
-  senderId    String?
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId      String   @db.ObjectId
+  senderId    String?  @db.ObjectId
   content     String?
   messageType String   @default("text") // text, image, file
   timeStamp  DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   // Relations
-  chat   Chat  @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender User? @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  chat   Chat  @relation(fields: [chatId], references: [id])
+  sender User? @relation(fields: [senderId], references: [id])
   statuses MessageStatus[]
 
   @@index([chatId, createdAt])
 }
 
 model MessageStatus {
-  id        String   @id @default(uuid())
-  messageId String
-  userId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId String   @db.ObjectId
+  userId    String   @db.ObjectId
   status    String   @default("delivered") // sent, delivered, read
   updatedAt DateTime @default(now())
 
   // Relations
-  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message Message @relation(fields: [messageId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
 
   @@unique([messageId, userId])
   @@index([messageId])
@@ -88,10 +85,10 @@ model MessageStatus {
 
 
 model CallSession {
-  id          String   @id @default(uuid())
-  chatId      String
-  initiatorId String
-  receiverId  String
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId      String   @db.ObjectId
+  initiatorId String   @db.ObjectId
+  receiverId  String   @db.ObjectId
   callType    String   // audio, video
   status      String   @default("initiated") // initiated, ringing, in_progress, ended
   startedAt   DateTime @default(now())

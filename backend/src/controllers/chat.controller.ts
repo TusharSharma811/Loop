@@ -132,20 +132,24 @@ class ChatController {
           error: "One-on-one chats must have exactly two participants",
         });
       }
-      const checkChat = await prisma.chat.findFirst({
-        where: {
-          isGroup: false,
-          participants: {
-            every: {
-              userId: {
-                in: uniqueParticipantIds,
-              },
-            },
+      // MongoDB (via Prisma) doesn't support `every` filter on relations. Replace with two `some` filters
+      // and validate participant count in code to ensure it's exactly those two users.
+      let checkChat = null as any;
+      if (!isGroup && uniqueParticipantIds.length === 2) {
+        const [u1, u2] = uniqueParticipantIds;
+        checkChat = await prisma.chat.findFirst({
+          where: {
+            isGroup: false,
+            AND: [
+              { participants: { some: { userId: u1 } } },
+              { participants: { some: { userId: u2 } } },
+            ],
           },
-        },
-      });
-      if (checkChat) {
-        return res.status(200).json(checkChat);
+          include: { participants: true },
+        });
+        if (checkChat && checkChat.participants.length === 2) {
+          return res.status(200).json(checkChat);
+        }
       }
       const newChat = await prisma.chat.create({
         data: {
@@ -249,6 +253,20 @@ class ChatController {
           .status(404)
           .json({ error: "Chat not found or access denied" });
       }
+      // Emulate cascade deletes (Mongo doesn't enforce referential actions)
+      // 1) Delete message statuses for messages in this chat
+      const msgs = await prisma.message.findMany({
+        where: { chatId },
+        select: { id: true },
+      });
+      const msgIds = msgs.map((m) => m.id);
+      if (msgIds.length > 0) {
+        await prisma.messageStatus.deleteMany({ where: { messageId: { in: msgIds } } });
+      }
+      // 2) Delete messages and participants
+      await prisma.message.deleteMany({ where: { chatId } });
+      await prisma.chatParticipant.deleteMany({ where: { chatId } });
+      // 3) Delete the chat document
       await prisma.chat.delete({ where: { id: chatId } });
       res.status(200).json({ message: "Chat deleted successfully" });
     } catch (error) {

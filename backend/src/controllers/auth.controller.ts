@@ -29,7 +29,7 @@ class AuthController {
     try {
       const { email, password } = req.body;
 
-      const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -59,6 +59,7 @@ class AuthController {
     try {
       const { username, email, fullname, password } = req.body;
 
+      // Mongo note: unique constraints still enforced; query unchanged.
       const existingUser = await prisma.user.findFirst({
         where: { OR: [{ email }, { username }] },
       });
@@ -166,7 +167,7 @@ class AuthController {
     });
     const { email, name, id: googleId, picture } = profileRes.data;
 
-    let user = await prisma.user.findUnique({ where: { email } });
+  let user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       user = await prisma.user.create({
         data: {

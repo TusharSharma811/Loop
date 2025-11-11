@@ -41,8 +41,8 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
     const isOwnMessage = conversation.lastMessage.senderId === currentUser?.id;
     
     const preview =
-    conversation.lastMessage.messageType === "image"
-      ? "Sent an image"
+    conversation.lastMessage.messageType !== "text"
+      ? "Image"
       : conversation.lastMessage.content.length > 30
         ? conversation.lastMessage.content.substring(0, 30) + "..."
         : conversation.lastMessage.content;

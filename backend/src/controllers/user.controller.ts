@@ -31,10 +31,10 @@ class userController {
         try {
             const userId = (req as any).user.userId;
             const { fullname, bio } = req.body;
-            const user = await prisma.user.update({
-                where: { id: userId },
-                data: { fullname, bio },
-            });
+      const user = await prisma.user.update({
+        where: { id: userId },
+        data: { fullname, bio },
+      });
             return res.status(200).json({ user });
         } catch (error) {
             console.error("Error updating user", error);

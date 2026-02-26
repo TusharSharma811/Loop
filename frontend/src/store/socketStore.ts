@@ -58,8 +58,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
   sendMessage: (event, data) => {
     const socket = get().socket;
     if (socket) {
-      socket.emit(event, data );
-    }
+      socket.emit(event, data);
     }
   },
 }));

@@ -58,10 +58,10 @@ class MessageController {
     }
   }
 
-  private isUserParticipant = async (
+  private isUserParticipant(
     participants: { userId: string }[],
     userId: string
-  ): Promise<boolean> => {
+  ): boolean {
     return participants.some((p) => p.userId === userId);
   }
 }

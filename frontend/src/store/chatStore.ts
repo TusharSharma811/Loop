@@ -57,11 +57,9 @@ const useChatStore = create<ChatStore>((set) => ({
 
     const data: Chat[] = response.data;
 
-    set((state) =>
-      JSON.stringify(state.chats) !== JSON.stringify(data)
-        ? { chats: data, loading: false }
-        : { loading: false }
-    );
+    set((state) => {
+      return { chats: data, loading: false };
+    });
   } catch (error) {
     set({
       error: error instanceof Error ? error.message : "Unknown error",
@@ -91,7 +89,7 @@ const useChatStore = create<ChatStore>((set) => ({
       if (exists) {
         return { chats: state.chats  };
       }
-      console.log("Adding new chat:", newChat);
+
       
       return { chats: [...state.chats, newChat]};
     });

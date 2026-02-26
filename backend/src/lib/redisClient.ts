@@ -1,11 +1,14 @@
 import redis from 'redis';
+import logger from '../utils/logger.js';
+
+const redisPort = parseInt(process.env.REDIS_PORT || '17312', 10);
 
 const publisher = redis.createClient({
         username: 'default',
         password: process.env.REDIS_PASSWORD as string,
         socket: {
                 host: process.env.REDIS_URL,
-                port: 17312
+                port: redisPort
         }
 });
 
@@ -14,27 +17,25 @@ const subscriber = redis.createClient({
         password: process.env.REDIS_PASSWORD as string,
         socket: {
                 host: process.env.REDIS_URL,
-                port: 17312
+                port: redisPort
         }
 });
 
 // Add error handling for Redis connections
 publisher.on('error', (err) => {
-        console.error('Redis Publisher Error:', err);
+        logger.error('Redis Publisher Error:', err);
 });
 
 publisher.on('connect', () => {
-        console.log('Redis Publisher connected');
+        logger.info('Redis Publisher connected');
 });
 
 subscriber.on('error', (err) => {
-        console.error('Redis Subscriber Error:', err);
+        logger.error('Redis Subscriber Error:', err);
 });
 
 subscriber.on('connect', () => {
-        console.log('Redis Subscriber connected');
+        logger.info('Redis Subscriber connected');
 });
 
 export { publisher, subscriber };
-
-// already initialized above

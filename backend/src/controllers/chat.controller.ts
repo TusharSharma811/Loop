@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import prisma from "../lib/prismaClient.js";
 import type { RequestWithUser } from "../middlewares/protectRoutes.ts";
+import logger from "../utils/logger.js";
 
 class ChatController {
   getChatsofUser = async (req: RequestWithUser, res: Response) => {
@@ -52,7 +53,7 @@ class ChatController {
 
       return res.status(200).json(formatted);
     } catch (error) {
-      console.error("Error fetching user chats:", error);
+      logger.error("Error fetching user chats:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   };
@@ -75,16 +76,20 @@ class ChatController {
             { username: { contains: searchTerm, mode: "insensitive" } },
             { fullname: { contains: searchTerm, mode: "insensitive" } },
           ],
+          id: { not: userId },
+        },
+        select: {
+          id: true,
+          username: true,
+          fullname: true,
+          email: true,
+          avatarUrl: true,
+          bio: true,
         },
       });
-      const usersWithoutPassword = users.filter((u) => {
-        if (u.id === userId) return false;
-        u.passwordHash = "";
-        return true;
-      });
-      res.status(200).json(usersWithoutPassword);
+      res.status(200).json(users);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      logger.error("Error fetching users:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   };
@@ -106,7 +111,7 @@ class ChatController {
         !Array.isArray(participantIds) ||
         participantIds.length === 0
       ) {
-        console.log("Participant IDs:", participantIds);
+        logger.warn("Invalid participant IDs:", participantIds);
 
         return res
           .status(400)
@@ -114,7 +119,7 @@ class ChatController {
       }
 
       if (isGroup && (!groupName || groupName.trim() === "")) {
-        console.log("Group name:", groupName);
+        logger.warn("Missing group name for group chat");
         return res
           .status(400)
           .json({ error: "Group name is required for group chats" });
@@ -156,8 +161,8 @@ class ChatController {
           isGroup: Boolean(isGroup),
           name: isGroup ? groupName : null,
           participants: {
-            create: participantIds.map((id: string) => ({
-              user: { connect: { id } }, // ✅ Connect user via ChatParticipant
+            create: uniqueParticipantIds.map((id: string) => ({
+              user: { connect: { id } },
               role: id === userId ? "admin" : "member",
             })),
           },
@@ -180,7 +185,7 @@ class ChatController {
       };
       res.status(201).json(formatted);
     } catch (error) {
-      console.error("Error creating chat:", error);
+      logger.error("Error creating chat:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   };
@@ -224,7 +229,7 @@ class ChatController {
 
       res.status(200).json(chat);
     } catch (error) {
-      console.error("Error fetching chat by ID:", error);
+      logger.error("Error fetching chat by ID:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   };
@@ -270,7 +275,7 @@ class ChatController {
       await prisma.chat.delete({ where: { id: chatId } });
       res.status(200).json({ message: "Chat deleted successfully" });
     } catch (error) {
-      console.error("Error deleting chat:", error);
+      logger.error("Error deleting chat:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   };

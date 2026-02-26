@@ -11,7 +11,7 @@ import { ChatListSkeleton } from "./skeletons/ChatAreaSkeleton";
 
 
 interface SidebarProps {
-  
+
   activeConversationId: string | null;
   onConversationSelect: (conversationId: string) => void;
   isOpen: boolean;
@@ -19,13 +19,13 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  
+
   activeConversationId,
   onConversationSelect,
   isOpen,
   onToggle,
 }) => {
-  const {chats:conversations , loading} = useChatStore();
+  const { chats: conversations, loading } = useChatStore();
   const [searchQuery, setSearchQuery] = useState("");
 
   // ✅ Use selectors so Sidebar doesn’t re-render unnecessarily
@@ -36,7 +36,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   // ✅ Memoize filtering
   const filteredConversations = useMemo(() => {
-    console.log("Filtering conversations" , conversations);
     return conversations.filter((conv) => {
       const name =
         (conv.isGroup && conv.groupName) ||
@@ -72,13 +71,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Sidebar */}
-      
+
       <div
         className={`fixed lg:relative inset-y-0 left-0 z-20
           w-80 bg-white border-r border-gray-200 
           transform transition-transform duration-300 ease-in-out 
-          ${
-            isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
           } h-full flex flex-col [scrollbar-gutter:none]`}
       >
         {/* Header */}
@@ -128,27 +126,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Conversations */}
         {loading ? (
-        <div className="p-4 flex-1 overflow-y-auto">
-          <ChatListSkeleton />
-        </div>
-      ) : (
-        <div className="overflow-y-auto flex-1">
-          {filteredConversations.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              {searchQuery ? "No conversations found" : "No conversations yet"}
-            </div>
-          ) : (
-            filteredConversations.map((conversation) => (
-              <ConversationItem
-                key={conversation.id}
-                conversation={conversation}
-                isActive={activeConversationId === conversation.id}
-                onClick={() => handleConversationClick(conversation)}
-              />
-            ))
-          )}
-        </div>)
-}
+          <div className="p-4 flex-1 overflow-y-auto">
+            <ChatListSkeleton />
+          </div>
+        ) : (
+          <div className="overflow-y-auto flex-1">
+            {filteredConversations.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                {searchQuery ? "No conversations found" : "No conversations yet"}
+              </div>
+            ) : (
+              filteredConversations.map((conversation) => (
+                <ConversationItem
+                  key={conversation.id}
+                  conversation={conversation}
+                  isActive={activeConversationId === conversation.id}
+                  onClick={() => handleConversationClick(conversation)}
+                />
+              ))
+            )}
+          </div>)
+        }
       </div>
     </>
   );

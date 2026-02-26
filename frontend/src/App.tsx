@@ -17,18 +17,17 @@ import ChatAppSkeleton from './components/skeletons/ChatLoading';
 
 
 function App() {
-  const { fetchUser, user } = useUserStore();
+  const { fetchUser } = useUserStore();
   const { connect } = useSocketStore();
- 
+
   const [isLoading, setIsLoading] = useState(true);
- 
+
 
   useEffect(() => {
     const init = async () => {
       try {
-        if (!user) await fetchUser();
+        await fetchUser();
         await connect();
-        
       } catch (error) {
         console.error('App initialization failed:', error);
       } finally {
@@ -36,37 +35,38 @@ function App() {
       }
     };
     init();
-  }, [user, fetchUser, connect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isLoading) {
     return (
       <ChatAppSkeleton />
     );
   }
- 
 
-  
+
+
   return (
 
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<PublicRouteWrapper><LandingPage /></PublicRouteWrapper>} />
-          <Route path="auth/:mode" element={<PublicRouteWrapper><AuthPage /></PublicRouteWrapper>} />
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<PublicRouteWrapper><LandingPage /></PublicRouteWrapper>} />
+        <Route path="auth/:mode" element={<PublicRouteWrapper><AuthPage /></PublicRouteWrapper>} />
 
-          {/* Protected routes */}
-          <Route path="chat/:chatId?" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
-          <Route path="call/:callId" element={<ProtectedRoute><CallPage /></ProtectedRoute>} />
-          <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        {/* Protected routes */}
+        <Route path="chat/:chatId?" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+        <Route path="call/:callId" element={<ProtectedRoute><CallPage /></ProtectedRoute>} />
+        <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-          {/* Fallback */}
-          <Route path="*" element={<div>404 Not Found</div>} />
-        </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<div>404 Not Found</div>} />
+      </Routes>
 
-        {/* Global CallManager */}
-        
-      </BrowserRouter>
-  
+      {/* Global CallManager */}
+
+    </BrowserRouter>
+
   );
 }
 

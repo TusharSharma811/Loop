@@ -1,8 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 import logger from '../utils/logger.js';
-dotenv.config();
 
 export interface RequestWithUser extends Request {
     user?: { userId: string };

@@ -3,10 +3,9 @@ import prisma from "../lib/prismaClient.js";
 import bcrypt from "bcryptjs"
 import { generateJWT, generateRefreshJWT } from "../utils/generateJWT.js";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import axios from "axios";
-
-dotenv.config();
+import crypto from "crypto";
+import logger from "../utils/logger.js";
 
 class AuthController {
 
@@ -49,7 +48,7 @@ class AuthController {
         user: { id: user.id, email: user.email },
       });
     } catch (error) {
-      console.error("Error logging in", error);
+      logger.error("Error logging in", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -82,7 +81,7 @@ class AuthController {
         user: { id: user.id, email: user.email, username: user.username },
       });
     } catch (error) {
-      console.error("Error registering", error);
+      logger.error("Error registering", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -90,11 +89,16 @@ class AuthController {
   // 🟢 LOGOUT
   logout = (req: Request, res: Response) => {
     try {
-      res.clearCookie("token");
-      res.clearCookie("refreshToken");
+      const cookieOpts = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none" as const,
+      };
+      res.clearCookie("token", cookieOpts);
+      res.clearCookie("refreshToken", cookieOpts);
       return res.status(200).json({ message: "Logout successful" });
     } catch (error) {
-      console.error("Error logging out", error);
+      logger.error("Error logging out", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
@@ -121,22 +125,30 @@ class AuthController {
         .status(200)
         .json({ message: "Token refreshed successfully", valid: true });
     } catch (error) {
-      console.error("Error refreshing token", error);
+      logger.error("Error refreshing token", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }
 
   // 🟢 GOOGLE LOGIN (placeholder)
   googleLogin = (req: Request, res: Response) => {
-    const googleOauthUrl = process.env.GOOGLE_OAUTH_URL ;
-    const redirectUl = process.env.GOOGLE_OAUTH_REDIRECT_URL || "http://localhost:3000/api/v1/auth/google-login/callback" ;
-    const client_id = process.env.GOOGLE_OAUTH_CLIENT_ID ;
-    const state = "someRandomState" ;
+    const googleOauthUrl = process.env.GOOGLE_OAUTH_URL;
+    const redirectUl = process.env.GOOGLE_OAUTH_REDIRECT_URL || "http://localhost:3000/api/v1/auth/google-login/callback";
+    const client_id = process.env.GOOGLE_OAUTH_CLIENT_ID;
+    const state = crypto.randomUUID();
     const scopes = [
       "https://www.googleapis.com/auth/userinfo.email",
       "https://www.googleapis.com/auth/userinfo.profile",
-      
     ].join(" ");
+
+    // Store state in a short-lived cookie for CSRF verification
+    res.cookie("oauth_state", state, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 5 * 60 * 1000, // 5 min
+    });
+
     const authUrl = `${googleOauthUrl}?response_type=code&client_id=${client_id}&redirect_uri=${redirectUl}&scope=${scopes}&state=${state}&access_type=offline&prompt=consent`;
     return res.redirect(authUrl);
   }
@@ -146,60 +158,62 @@ class AuthController {
       const redirectUl = process.env.GOOGLE_OAUTH_REDIRECT_URL || "http://localhost:3000/api/v1/auth/google-login/callback";
       const client_id = process.env.GOOGLE_OAUTH_CLIENT_ID;
       const client_secret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
-      const state = "someRandomState";
 
-    const { code, state: returnedState } = req.query;
-    if (state !== returnedState) {
-      return res.status(400).json({ message: "Invalid state parameter" });
-    }
-    const tokenRes = await axios.post("https://oauth2.googleapis.com/token", 
-      {
+      // Verify state from cookie to prevent CSRF
+      const expectedState = req.cookies.oauth_state;
+      const { code, state: returnedState } = req.query;
+      res.clearCookie("oauth_state");
+
+      if (!expectedState || expectedState !== returnedState) {
+        return res.status(400).json({ message: "Invalid state parameter" });
+      }
+
+      const tokenRes = await axios.post("https://oauth2.googleapis.com/token", {
         code,
-        client_id: client_id,
-        client_secret: client_secret,
+        client_id,
+        client_secret,
         redirect_uri: redirectUl,
         grant_type: "authorization_code",
-      },
-    );
-    const { access_token, refresh_token } = tokenRes.data;
-    const profileRes = await axios.get("https://www.googleapis.com/oauth2/v1/userinfo", {
-      headers: { Authorization: `Bearer ${access_token}` },
-    });
-    const { email, name, id: googleId, picture } = profileRes.data;
-
-  let user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          fullname: name,
-          username: email.split("@")[0],
-          passwordHash: bcrypt.hashSync(googleId, 10),
-          refreshToken: refresh_token,
-          avatarUrl: picture,
-        },
       });
-    }
-    const authToken = generateJWT(user.id);
-    const refreshToken = generateRefreshJWT(user.id);
-    this.setAuthCookies(res, authToken, refreshToken);
-    return res.status(200).send(
-      `
-      <script>
-        window.opener.postMessage({ 
-          type: 'google-auth-success',
-    }, '*');
-        window.close();
-      </script>
-      <p>Authentication successful. You can close this window.</p>
-      `
-    )
+      const { access_token, refresh_token } = tokenRes.data;
+      const profileRes = await axios.get("https://www.googleapis.com/oauth2/v1/userinfo", {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+      const { email, name, id: googleId, picture } = profileRes.data;
 
+      let user = await prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email,
+            fullname: name,
+            username: email.split("@")[0],
+            passwordHash: bcrypt.hashSync(googleId, 10),
+            refreshToken: refresh_token,
+            avatarUrl: picture,
+          },
+        });
+      }
+      const authToken = generateJWT(user.id);
+      const refreshToken = generateRefreshJWT(user.id);
+      this.setAuthCookies(res, authToken, refreshToken);
+
+      const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+      return res.status(200).send(
+        `
+        <script>
+          window.opener.postMessage({ 
+            type: 'google-auth-success',
+          }, '${allowedOrigin}');
+          window.close();
+        </script>
+        <p>Authentication successful. You can close this window.</p>
+        `
+      );
     } catch (error) {
-      console.error("Error during Google login callback", error);
+      logger.error("Error during Google login callback", error);
       return res.status(500).json({ message: "Internal server error" });
     }
-     
   }
 
   // 🟢 VERIFY

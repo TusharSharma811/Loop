@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import api from '../lib/axiosInstance';
-import { Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 export interface Message {
   id?: string;
   chatId: string;

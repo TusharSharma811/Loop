@@ -1,6 +1,7 @@
 
 import cloudinary from "../lib/cloudinaryClient.js";
 import fs from "fs";
+import logger from "../utils/logger.js";
 
 class UploadService {
 
@@ -14,7 +15,8 @@ class UploadService {
         responsive: true,            
       });
 
-      fs.unlinkSync(filePath);
+      // Use async unlink to avoid blocking the event loop
+      await fs.promises.unlink(filePath);
 
       return {
         url: result.secure_url,
@@ -23,7 +25,9 @@ class UploadService {
         resource_type: result.resource_type,
       };
     } catch (err) {
-      console.error("UploadService error:", err);
+      logger.error("UploadService error:", err);
+      // Best-effort cleanup: if the temp file still exists, remove it
+      try { await fs.promises.unlink(filePath); } catch { /* already gone */ }
       throw new Error("File upload failed");
     }
   }
@@ -33,7 +37,7 @@ class UploadService {
       const uploadPromises = filePaths.map((path) => this.upload(path, folder));
       return await Promise.all(uploadPromises);
     } catch (err) {
-      console.error("UploadService multiple error:", err);
+      logger.error("UploadService multiple error:", err);
       throw new Error("Multiple file upload failed");
     }
   }

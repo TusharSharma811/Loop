@@ -21,10 +21,6 @@ api.interceptors.response.use(
   (res) => res,
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
-    if (error.response?.status === 500) {
-      // Avoid hook misuse; direct redirect keeps behavior similar
-      window.location.href = '/auth/login';
-    }
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

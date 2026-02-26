@@ -77,7 +77,6 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
 
     const existingClient = get().client;
     if (existingClient) {
-      console.log("⚠️ Stream client already exists, skipping fetch");
       return;
     }
 
@@ -88,15 +87,10 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
       const newClient = new StreamVideoClient({ apiKey });
       await newClient.connectUser({ id: user.id }, token);
 
-      // helpful debug during dev
-      newClient.on("all", (event: { type: string }) => {
-        console.debug("Stream event:", event.type, event);
-      });
+
 
       set({ client: newClient });
-      console.log("✅ Connected Stream Video client:", user.id);
     } catch (error) {
-      console.error("❌ Error fetching call stream client:", error);
       set({ callError: "Failed to initialize call service" });
     }
   },
@@ -142,9 +136,7 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
         activeCall: call,
         callError: null,
       });
-      console.log("Outgoing call initiated:", get().outgoingCall);
     } catch (error) {
-      console.error("Failed to initiate call:", error);
       set({ callError: "Failed to start call" });
     }
   },
@@ -157,16 +149,12 @@ export const useCallStreamStore = create<CallStreamStore>((set, get) => ({
       const call = client.call("default", callId);
       try {
         await call.leave();
-      } catch (e) {
-        console.warn("Failed leaving call", e);
-      }
+      } catch { /* already left */ }
       try {
         await call.delete();
-      } catch (e) {
-        console.warn("Failed deleting call", e);
-      }
-    } catch (e) {
-      console.warn("Failed deleting call", e);
+      } catch { /* already deleted */ }
+    } catch {
+      // outer catch
     } finally {
       // cleanup store
       get().clearActiveCall();

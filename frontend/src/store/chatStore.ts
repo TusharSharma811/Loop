@@ -57,9 +57,7 @@ const useChatStore = create<ChatStore>((set) => ({
 
     const data: Chat[] = response.data;
 
-    set((state) => {
-      return { chats: data, loading: false };
-    });
+    set({ chats: data, loading: false });
   } catch (error) {
     set({
       error: error instanceof Error ? error.message : "Unknown error",

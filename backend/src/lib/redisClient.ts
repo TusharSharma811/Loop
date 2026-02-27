@@ -1,7 +1,7 @@
 import redis from 'redis';
 import logger from '../utils/logger.js';
 
-const redisPort = parseInt(process.env.REDIS_PORT || '17312', 10);
+const redisPort = parseInt(process.env.REDIS_PORT || '13603', 10);
 
 const publisher = redis.createClient({
         username: 'default',

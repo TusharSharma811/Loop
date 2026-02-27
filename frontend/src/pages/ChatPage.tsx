@@ -16,22 +16,16 @@ import { useCallStreamStore } from "../store/callStreamStore";
 
 const CallManagerWrapper = () => {
   const navigate = useNavigate();
-
-  const handleNavigateToCall = (callId: string) => {
-    navigate(`/call/${callId}`);
-  };
-
+  const handleNavigateToCall = (callId: string) => navigate(`/call/${callId}`);
   return <CallManager onNavigateToCall={handleNavigateToCall} />;
 };
 
 export const ChatPage: React.FC = () => {
   const { fetchChats, chats, loading: chatLoading } = useChatStore();
   const { modalOpen } = useSearchUserStore();
-  const { loading , user } = useUserStore();
-   const { fetchClient, client } = useCallStreamStore();
-  const [activeConversationId, setActiveConversationId] = useState<
-    string | null
-  >(null);
+  const { loading, user } = useUserStore();
+  const { fetchClient, client } = useCallStreamStore();
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,7 +38,7 @@ export const ChatPage: React.FC = () => {
       await fetchClient();
     }
     initialize();
-  }, [fetchChats , user, fetchClient]);
+  }, [fetchChats, user, fetchClient]);
 
   useEffect(() => {
     if (chat) {
@@ -60,67 +54,48 @@ export const ChatPage: React.FC = () => {
     }
   }, [activeConversationId]);
 
-  const activeConversation =
-    chats?.find((c) => c.id === activeConversationId) || null;
+  const activeConversation = chats?.find((c) => c.id === activeConversationId) || null;
 
   const handleConversationSelect = (conversationId: string) => {
     setActiveConversationId(conversationId);
     navigate(`/chat/${conversationId}`);
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
-  };
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   return (
     <>
       {!client || chatLoading || loading ? (
         <ChatAppSkeleton />
       ) : (
-            <StreamVideo client={client}>
-        <motion.div
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: 1 }}
-          className="flex overflow-hidden relative h-screen bg-gray-100"
-        >
-          {/* Sidebar */}
-          <div className="flex h-screen">
-            <Sidebar
-              // conversations={chats || []}
-              activeConversationId={activeConversationId}
-              onConversationSelect={handleConversationSelect}
-              isOpen={sidebarOpen}
-              onToggle={toggleSidebar}
-            />
-          </div>
+        <StreamVideo client={client}>
+          <motion.div
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            className="flex overflow-hidden relative h-screen bg-bg"
+          >
+            <div className="flex h-screen">
+              <Sidebar
+                activeConversationId={activeConversationId}
+                onConversationSelect={handleConversationSelect}
+                isOpen={sidebarOpen}
+                onToggle={toggleSidebar}
+              />
+            </div>
 
-          {/* Search Modal */}
-          {modalOpen && (
-            <UserSearchModal
-              isOpen={modalOpen}
-              onClose={() => {}}
-              onSelectUser={() => {}}
-            />
-          )}
+            {modalOpen && (
+              <UserSearchModal isOpen={modalOpen} onClose={() => { }} onSelectUser={() => { }} />
+            )}
 
-          {/* Main Chat Area */}
-          <div className="flex-1 flex flex-col min-w-0">
-            <ChatHeader
-              conversation={activeConversation}
-              onSidebarToggle={toggleSidebar}
-            />
-
-            <ChatArea
-              conversation={activeConversation}
-              users={
-                activeConversation?.participants.filter(
-                  (chatUser) => chatUser.id !== user?.id
-                ) || []
-              }
-            />
-          </div>
-        </motion.div>
-        <CallManagerWrapper />
+            <div className="flex-1 flex flex-col min-w-0">
+              <ChatHeader conversation={activeConversation} onSidebarToggle={toggleSidebar} />
+              <ChatArea
+                conversation={activeConversation}
+                users={activeConversation?.participants.filter((chatUser) => chatUser.id !== user?.id) || []}
+              />
+            </div>
+          </motion.div>
+          <CallManagerWrapper />
         </StreamVideo>
       )}
     </>

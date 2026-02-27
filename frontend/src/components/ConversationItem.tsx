@@ -3,6 +3,7 @@ import type { Chat } from "../store/chatStore";
 import useUserStore from "../store/userStore";
 import defaultImage from '../assets/default-avatar.png';
 import useChatStore from "../store/chatStore";
+
 interface ConversationItemProps {
   conversation: Chat;
   isActive: boolean;
@@ -13,114 +14,84 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   conversation,
   isActive,
   onClick,
-} ) => {
+}) => {
   const { user: currentUser } = useUserStore();
   const { onlineUsers } = useChatStore();
+
   const getConversationName = () => {
-    if (conversation.isGroup && conversation.groupName) {
-      return conversation.groupName;
-    }
-    return (
-      conversation.participants.find((p) => p.id !== currentUser?.id)?.fullname ||
-  
-      "Unknown"
-    );
+    if (conversation.isGroup && conversation.groupName) return conversation.groupName;
+    return conversation.participants.find((p) => p.id !== currentUser?.id)?.fullname || "Unknown";
   };
 
   const getConversationAvatar = () => {
-    if (conversation.isGroup && conversation.groupName) {
-      return conversation.name || defaultImage;
-    }
+    if (conversation.isGroup && conversation.groupName) return conversation.name || defaultImage;
     const otherParticipant = conversation.participants.find((p) => p.id !== currentUser?.id);
-    return otherParticipant?.avatarUrl != "" ? defaultImage : otherParticipant?.avatarUrl ;
+    return otherParticipant?.avatarUrl && otherParticipant.avatarUrl !== "" ? otherParticipant.avatarUrl : defaultImage;
   };
 
   const getLastMessagePreview = () => {
     if (!conversation.lastMessage) return "No messages yet";
-
     const isOwnMessage = conversation.lastMessage.senderId === currentUser?.id;
-    
     const preview =
-    conversation.lastMessage.messageType !== "text"
-      ? "Image"
-      : conversation.lastMessage.content.length > 30
-        ? conversation.lastMessage.content.substring(0, 30) + "..."
-        : conversation.lastMessage.content;
-
+      conversation.lastMessage.messageType !== "text"
+        ? "📷 Image"
+        : conversation.lastMessage.content.length > 30
+          ? conversation.lastMessage.content.substring(0, 30) + "..."
+          : conversation.lastMessage.content;
     return isOwnMessage ? `You: ${preview}` : preview;
   };
 
   const formatTime = (date: Date) => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
-
     if (diff < 24 * 60 * 60 * 1000) {
       return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
     return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  const getStatusColor = () => {
-    if (conversation.isGroup) return "bg-gray-400";
-    if(!currentUser) return "bg-gray-400";
-    const otherParticipant = conversation.participants.find((p) => p.id !== currentUser.id);
-    if (!otherParticipant) return "bg-gray-400";
-    const isOnline = onlineUsers.includes(otherParticipant.id);
-    console.log("Other Participant:", otherParticipant, "Is Online:", isOnline);
-    
-    const status = isOnline ? "online" : "offline";
-    switch (status) {
-      case "online":
-        return "bg-green-500";
-      case "offline":
-        return "bg-yellow-500";
-      default:
-        return "bg-gray-400";
-    }
-  };
+  const isOnline = (() => {
+    if (conversation.isGroup || !currentUser) return false;
+    const other = conversation.participants.find((p) => p.id !== currentUser.id);
+    return other ? onlineUsers.includes(other.id) : false;
+  })();
 
   return (
     <div
-      className={`flex items-center p-4 cursor-pointer transition-all duration-200 hover:bg-gray-50 ${
-        isActive ? "bg-blue-50 border-r-2 border-blue-500" : ""
-      }`}
+      className={`flex items-center p-3 mx-2 my-0.5 cursor-pointer rounded-xl transition-all duration-200 ${isActive
+          ? "bg-primary/10 border border-primary/20"
+          : "hover:bg-surface-hover border border-transparent"
+        }`}
       onClick={onClick}
     >
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <img
           src={getConversationAvatar()}
           alt={getConversationName()}
-          className="w-12 h-12 rounded-full object-cover"
+          className="w-11 h-11 rounded-full object-cover"
         />
         {!conversation.isGroup && (
           <div
-            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${getStatusColor()}`}
+            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-bg-secondary ${isOnline ? "bg-success" : "bg-text-muted/30"
+              }`}
           />
         )}
       </div>
 
       <div className="flex-1 ml-3 min-w-0">
         <div className="flex items-center justify-between">
-          <h3
-            className={`text-sm font-medium truncate ${
-              isActive ? "text-blue-700" : "text-gray-900"
-            }`}
-          >
+          <h3 className={`text-sm font-medium truncate ${isActive ? "text-primary-light" : "text-text"}`}>
             {getConversationName()}
           </h3>
           {conversation.lastMessage && (
-            <span className="text-xs text-gray-500 ml-2">
+            <span className="text-[11px] text-text-muted ml-2 flex-shrink-0">
               {formatTime(new Date(conversation.lastMessage.timeStamp))}
             </span>
           )}
         </div>
-
-        <div className="flex items-center justify-between mt-1">
-          <p className="text-sm text-gray-600 truncate">
-            {getLastMessagePreview()}
-          </p>
-        
-        </div>
+        <p className="text-xs text-text-muted truncate mt-0.5">
+          {getLastMessagePreview()}
+        </p>
       </div>
     </div>
   );

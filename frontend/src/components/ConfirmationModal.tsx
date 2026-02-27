@@ -1,68 +1,55 @@
-import {useEffect , } from 'react';
-import { TriangleAlert } from 'lucide-react'; // An icon for warning
+import { useEffect } from 'react';
+import { TriangleAlert } from 'lucide-react';
 
-const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
-  
-
-  // Handle Escape key press to close the modal
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+}) => {
   useEffect(() => {
-    const handleEsc = (event) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleEsc);
-
-    return () => {
-      window.removeEventListener('keydown', handleEsc);
-    };
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
-if (!isOpen) {
-    return null;
-  }
+
+  if (!isOpen) return null;
+
   return (
-    // The Modal Overlay
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity"
-      aria-labelledby="modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      onClick={onClose} // Close modal if overlay is clicked
+      onClick={onClose}
     >
-      {/* The Modal Panel */}
       <div
-        className="relative w-full max-w-md transform rounded-lg bg-white p-6 text-left shadow-xl transition-all"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the panel
+        className="relative w-full max-w-md glass-strong rounded-2xl p-6 shadow-[var(--shadow-elevated)]"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="sm:flex sm:items-start">
-          {/* Icon */}
-          <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-            <TriangleAlert className="h-6 w-6 text-red-600" aria-hidden="true" />
+          <div className="mx-auto flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-danger/15 sm:mx-0">
+            <TriangleAlert className="h-5 w-5 text-danger" />
           </div>
           <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-            {/* Title */}
-            <h3 className="text-base font-semibold leading-6 text-gray-900" id="modal-title">
-              {title}
-            </h3>
-            {/* Message */}
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">{message}</p>
-            </div>
+            <h3 className="text-base font-semibold text-text">{title}</h3>
+            <p className="mt-2 text-sm text-text-secondary">{message}</p>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse sm:px-4">
+        <div className="mt-5 sm:flex sm:flex-row-reverse sm:gap-3">
           <button
             type="button"
-            className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+            className="w-full sm:w-auto px-4 py-2 bg-danger text-white text-sm font-medium rounded-lg hover:bg-danger/80 transition-colors"
             onClick={onConfirm}
           >
             Delete
           </button>
           <button
             type="button"
-            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+            className="mt-3 sm:mt-0 w-full sm:w-auto px-4 py-2 glass text-text text-sm font-medium rounded-lg hover:bg-surface-hover transition-colors"
             onClick={onClose}
           >
             Cancel

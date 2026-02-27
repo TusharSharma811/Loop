@@ -1,79 +1,61 @@
 import React from 'react';
-import { MessageCircle, Users, Zap, Star, ArrowRight, Image } from 'lucide-react';
+import { MessageCircle, Users, Zap, ArrowRight, Image, Shield, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-
+import { motion } from 'motion/react';
 
 const features = [
-    {
-      icon: <MessageCircle className="h-6 w-6" />,
-      title: "Real-time Messaging",
-      description: "Instant message delivery with read receipts and typing indicators"
-    },
-    {
-      icon: <Users className="h-6 w-6" />,
-      title: "One-to-One Chats",
-      description: "Connect and collaborate seamlessly"
-    },
-    {
-      icon: <Image className="h-6 w-6" />,
-      title: "Image sharing",
-      description: "Share images seamlessly"
-    },
-    {
-      icon: <Zap className="h-6 w-6" />,
-      title: "Lightning Fast",
-      description: "Optimized performance for smooth conversations across all devices"
-    }
-  ];
-
-  const testimonials = [
-    {
-      name: "Sarah Chen",
-      role: "Product Manager",
-      avatar: "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-      content: "The best chat experience I've ever used. Clean, fast, and intuitive."
-    },
-    {
-      name: "Marcus Johnson",
-      role: "Software Engineer",
-      avatar: "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-      content: "Perfect for team collaboration. The group features are incredibly well designed."
-    },
-    {
-      name: "Emma Rodriguez",
-      role: "Designer",
-      avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2",
-      content: "Beautiful interface with attention to every detail. Love the user experience!"
-    }
-  ];
-
- 
+  {
+    icon: <MessageCircle className="h-6 w-6" />,
+    title: "Real-time Messaging",
+    description: "Instant delivery with typing indicators and live updates"
+  },
+  {
+    icon: <Users className="h-6 w-6" />,
+    title: "One-to-One Chats",
+    description: "Connect and collaborate seamlessly with anyone"
+  },
+  {
+    icon: <Image className="h-6 w-6" />,
+    title: "Image Sharing",
+    description: "Share images with instant preview and cloud storage"
+  },
+  {
+    icon: <Zap className="h-6 w-6" />,
+    title: "Lightning Fast",
+    description: "Optimized performance across all devices"
+  }
+];
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+    <div className="min-h-screen bg-bg overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-primary/10 blur-[120px] animate-glow" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-accent/10 blur-[120px] animate-glow" style={{ animationDelay: '1.5s' }} />
+      </div>
+
+      <nav className="fixed top-0 w-full glass z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <MessageCircle className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">LoopChat</span>
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 gradient-bg rounded-lg flex items-center justify-center">
+                <MessageCircle className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-text font-logo">Loop</span>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-
+            <div className="hidden md:flex items-center space-x-6">
+              <a href="#features" className="text-text-secondary hover:text-text transition-colors text-sm">Features</a>
               <button
                 onClick={() => navigate('/auth/signin')}
-                className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+                className="text-text-secondary hover:text-text transition-colors text-sm cursor-pointer"
               >
                 Sign In
               </button>
               <button
                 onClick={() => navigate('/auth/signup')}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                className="gradient-bg text-white px-5 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity cursor-pointer"
               >
                 Get Started
               </button>
@@ -82,148 +64,182 @@ export const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Connect with anyone,
-              <span className="text-blue-600 block">anywhere, instantly</span>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center"
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass mb-8 text-sm text-text-secondary">
+              <Sparkles className="h-4 w-4 text-primary-light" />
+              Real-time messaging, reimagined
+            </div>
+
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight">
+              <span className="text-text">Connect with anyone,</span>
+              <br />
+              <span className="gradient-text">anywhere, instantly</span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Experience the future of messaging with our beautiful, fast, and secure chat platform. 
-              Built for individuals and teams who value great design and seamless communication.
+
+            <p className="text-lg text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
+              Experience messaging with a beautiful dark interface, blazing-fast delivery,
+              and seamless image sharing. Built for people who value great design.
             </p>
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => navigate('/auth/signup')}
-                className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
+                className="gradient-bg text-white px-8 py-4 rounded-xl text-lg font-semibold hover:opacity-90 transform hover:scale-[1.03] transition-all duration-200 shadow-[var(--shadow-glow-primary)] cursor-pointer"
               >
                 Start Chatting Free
                 <ArrowRight className="inline-block ml-2 h-5 w-5" />
               </button>
-             
             </div>
-          </div>
-          
-          {/* Hero Image */}
-          <div className="mt-16 relative">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 shadow-2xl">
-              <div className="bg-white rounded-xl p-6 shadow-lg">
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mt-20 relative"
+          >
+            <div className="absolute inset-0 gradient-bg rounded-2xl opacity-20 blur-xl" />
+            <div className="relative glass-strong rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-elevated)]">
+              <div className="rounded-xl bg-bg-secondary p-6">
                 <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <MessageCircle className="h-6 w-6 text-blue-600" />
+                  <div className="w-12 h-12 gradient-bg rounded-full flex items-center justify-center">
+                    <MessageCircle className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Team Chat</h3>
-                    <p className="text-gray-500 text-sm">5 members online</p>
+                    <h3 className="font-semibold text-text">Team Chat</h3>
+                    <p className="text-text-muted text-sm">5 members online</p>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
-                    <img src="https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=2" alt="User" className="w-8 h-8 rounded-full" />
-                    <div className="bg-gray-100 rounded-2xl rounded-tl-md px-4 py-2 max-w-xs">
-                      <p className="text-sm text-gray-900">Hey team! The new design looks amazing 🎉</p>
+                    <img
+                      src="https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=2"
+                      alt="User"
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div className="bg-bg-tertiary rounded-2xl rounded-tl-md px-4 py-2.5 max-w-xs">
+                      <p className="text-sm text-text">Hey team! The new design looks amazing 🎉</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3 justify-end">
-                    <div className="bg-blue-600 text-white rounded-2xl rounded-tr-md px-4 py-2 max-w-xs">
-                      <p className="text-sm">Thanks! Ready to ship it?</p>
+                    <div className="gradient-bg rounded-2xl rounded-tr-md px-4 py-2.5 max-w-xs">
+                      <p className="text-sm text-white">Thanks! Ready to ship it? 🚀</p>
                     </div>
-                    <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=2" alt="You" className="w-8 h-8 rounded-full" />
+                    <img
+                      src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=2"
+                      alt="You"
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-16 bg-gray-50">
+      <section id="features" className="py-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Everything you need for great conversations
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-text mb-4">
+              Everything you need for <span className="gradient-text">great conversations</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Powerful features designed to make communication effortless and enjoyable
+            <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+              Powerful features designed to make communication effortless
             </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-4">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="glass rounded-xl p-6 hover:bg-surface-hover transition-all duration-300 group"
+              >
+                <div className="w-12 h-12 rounded-lg gradient-bg flex items-center justify-center text-white mb-4 group-hover:shadow-[var(--shadow-glow-primary)] transition-shadow duration-300">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </div>
+                <h3 className="text-lg font-semibold text-text mb-2">{feature.title}</h3>
+                <p className="text-text-secondary text-sm leading-relaxed">{feature.description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-16">
+      <section className="py-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Loved by thousands of users
-            </h2>
-            <div className="flex items-center justify-center space-x-1 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-              ))}
-              <span className="ml-2 text-gray-600">4.9/5 from 2,000+ reviews</span>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <div className="flex items-center space-x-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
-                  ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { icon: <Shield className="h-6 w-6" />, title: "Enterprise Security", desc: "End-to-end encryption for all messages" },
+              { icon: <Zap className="h-6 w-6" />, title: "99.9% Uptime", desc: "Reliable infrastructure you can count on" },
+              { icon: <Sparkles className="h-6 w-6" />, title: "Modern Design", desc: "Beautiful dark interface with smooth animations" },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.15 }}
+                className="glass rounded-xl p-8 text-center"
+              >
+                <div className="w-14 h-14 rounded-full gradient-bg flex items-center justify-center text-white mx-auto mb-4">
+                  {item.icon}
                 </div>
-                <p className="text-gray-700 mb-4">"{testimonial.content}"</p>
-                <div className="flex items-center space-x-3">
-                  <img src={testimonial.avatar} alt={testimonial.name} className="w-10 h-10 rounded-full" />
-                  <div>
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-sm text-gray-500">{testimonial.role}</p>
-                  </div>
-                </div>
-              </div>
+                <h3 className="text-lg font-semibold text-text mb-2">{item.title}</h3>
+                <p className="text-text-secondary text-sm">{item.desc}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-     
-
-      {/* CTA Section */}
-      <section className="py-16">
+      <section className="py-20 relative">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Ready to transform your conversations?
-          </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Join thousands of users who have already made the switch to better messaging
-          </p>
-          <button
-            onClick={() => navigate('/auth/signup')}
-            className="bg-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            Join now
-            <ArrowRight className="inline-block ml-2 h-5 w-5" />
-          </button>
+            <h2 className="text-3xl sm:text-4xl font-bold text-text mb-4">
+              Ready to transform your <span className="gradient-text">conversations</span>?
+            </h2>
+            <p className="text-lg text-text-secondary mb-8">
+              Join thousands of users who have already made the switch
+            </p>
+            <button
+              onClick={() => navigate('/auth/signup')}
+              className="gradient-bg text-white px-8 py-4 rounded-xl text-lg font-semibold hover:opacity-90 transform hover:scale-[1.03] transition-all duration-200 shadow-[var(--shadow-glow-primary)] cursor-pointer"
+            >
+              Join now
+              <ArrowRight className="inline-block ml-2 h-5 w-5" />
+            </button>
+          </motion.div>
         </div>
       </section>
 
-
+      <footer className="py-8 border-t border-border">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-text-muted text-sm">© 2026 Loop. Built with 💜</p>
+        </div>
+      </footer>
     </div>
   );
 };

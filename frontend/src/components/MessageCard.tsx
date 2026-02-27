@@ -3,6 +3,7 @@ import type { Message } from '../store/messageStore';
 import type { User } from '../store/userStore';
 import defaultImage from '../assets/default-avatar.png';
 import useUserStore from '../store/userStore';
+
 interface MessageBubbleProps {
   message: Message;
   sender: User | undefined;
@@ -10,91 +11,67 @@ interface MessageBubbleProps {
   showAvatar: boolean;
 }
 
-export const MessageBubble: React.FC<MessageBubbleProps> = ({
-  message,
-  sender,
-  isOwn,
-  showAvatar
-}) => {
-  // const formatTime = (date: Date) => {
-  //   if (!isOwn) return null;
-  //   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  // };
+export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, sender, isOwn, showAvatar }) => {
   const user = useUserStore((state) => state.user);
 
-  // const getStatusIcon = () => {
-    
-  //   switch ( message && message.statuses.filter(s => s === 'read').length > 0 ? 'read' : message.statuses.filter(s => s === 'delivered').length > 0 ? 'delivered' : 'sent') {
-  //     case 'sent':
-  //       return <Check className="h-4 w-4 text-gray-400" />;
-  //     case 'delivered':
-  //       return <CheckCheck className="h-4 w-4 text-gray-400" />;
-  //     case 'read':
-  //       return <CheckCheck className="h-4 w-4 text-blue-500" />;
-  //     default:
-  //       return null;
-  //   }
-  // };
+  const formatTime = (date?: Date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
-    <div className={`flex items-end mb-4 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-end mb-1 ${isOwn ? 'justify-end' : 'justify-start'} ${showAvatar ? 'mt-3' : ''}`}>
       {!isOwn && (
-        <div className="mr-3">
+        <div className="mr-2 flex-shrink-0">
           {showAvatar ? (
             <img
-              src={ sender?.avatarUrl && sender?.avatarUrl != "" ? sender?.avatarUrl : defaultImage}
+              src={sender?.avatarUrl && sender?.avatarUrl !== "" ? sender?.avatarUrl : defaultImage}
               alt={sender?.fullname || 'User'}
-              className="w-8 h-8 rounded-full object-cover"
+              className="w-7 h-7 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8" />
+            <div className="w-7 h-7" />
           )}
         </div>
       )}
-      
-      <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'}`}>
+
+      <div className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} max-w-[70%]`}>
         {!isOwn && showAvatar && (
-          <span className="text-xs text-gray-500 mb-1 px-3">
-            {sender?.fullname}
-          </span>
+          <span className="text-[11px] text-text-muted mb-1 px-1">{sender?.fullname}</span>
         )}
-        
-        <div className={`
-          relative max-w-xs lg:max-w-md px-4 py-2 rounded-2xl
-          ${isOwn 
-            ? 'bg-blue-600 text-white rounded-br-md' 
-            : 'bg-gray-100 text-gray-900 rounded-bl-md'
-          }
-          shadow-sm
-        `}>
+
+        <div className={`relative px-4 py-2 rounded-2xl ${isOwn
+            ? 'gradient-bg text-white rounded-br-md'
+            : 'bg-bg-elevated text-text rounded-bl-md border border-border'
+          }`}>
           {message.messageType === 'image' ? (
             <img
               src={message.content}
-              alt="User uploaded"
-              className="max-w-full rounded-lg h-[256px] w-[256px] object-cover"
-            />
-          ): <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>}
-         
-{/*           
-          <div className={`flex items-center justify-end mt-1 space-x-1 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
-            <span className="text-xs opacity-75">
-              {formatTime(message.timestamp)}
-            </span>
-            {getStatusIcon()}
-          </div> */}
-        </div>
-      </div>
-      
-      {isOwn && (
-        <div className="ml-3">
-          {showAvatar ? (
-            <img
-              src={user?.avatarUrl &&user?.avatarUrl != "" ? user?.avatarUrl : defaultImage}
-              alt={user?.fullname || 'User'}
-              className="w-8 h-8 rounded-full object-cover"
+              alt="Shared image"
+              className="max-w-full rounded-lg h-[240px] w-[240px] object-cover"
+              loading="lazy"
             />
           ) : (
-            <div className="w-8 h-8" />
+            <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
+          )}
+        </div>
+
+        <span className={`text-[10px] mt-0.5 px-1 ${isOwn ? 'text-text-muted/60' : 'text-text-muted/40'}`}>
+          {formatTime(message.timestamp || message.timeStamp)}
+        </span>
+      </div>
+
+      {isOwn && (
+        <div className="ml-2 flex-shrink-0">
+          {showAvatar ? (
+            <img
+              src={user?.avatarUrl && user?.avatarUrl !== "" ? user?.avatarUrl : defaultImage}
+              alt={user?.fullname || 'User'}
+              className="w-7 h-7 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-7 h-7" />
           )}
         </div>
       )}
